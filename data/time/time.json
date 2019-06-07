@@ -1,0 +1,1 @@
+{"time_range": [{"id": 0, "day": 1, "range": [25240, 64858]}, {"id": 1, "day": 2, "range": [27050, 72091]}, {"id": 2, "day": 3, "range": [27070, 45164]}], "types": [{"id": 0, "name": "第一天"}, {"id": 1, "name": "第二天"}, {"id": 2, "name": "第三天"}], "relations": [{"rid": 0, "tid": "0"}, {"rid": 1, "tid": "1"}, {"rid": 2, "tid": "2"}], "time_labels": []}

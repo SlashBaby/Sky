@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>monitorCV</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- csss -->
+    <link rel="stylesheet" href="assets/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bubbles.css">
+    </style>
+    <!-- js -->
+    <script src="assets/jquery3.js"></script>
+    <script src="assets/popper.min.js"></script>
+    <script src="assets/fileSave.js"></script>
+    <script src="assets/d3.v5.min.js"></script>
+    <script src="assets/bootstrap.min.js"></script>
+    <script src="assets/echarts.min.js"></script>
+    <script src="js/globalVar.js"></script>
+    <script src="js/grids.js"></script>
+    <script src="js/tree.js"></script>
+    <script src="js/bubbles.js"></script>
+    <script src="js/areas.js"></script>
+    <script src="js/paraCoord.js"></script>
+    <script src="js/boxplot.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.4.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@3.3.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@4.2.0"></script>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.4.10/dist/g2.min.js"></script>
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.data-set-0.10.1/dist/data-set.min.js"></script>
+    <style>
+        * {
+        overflow:hidden;
+        margin:0px;
+        padding:0px;
+      }
+      #left-wrapper{
+        background:black;
+        height: 770px;
+      }
+      #left-nav{
+        background:#6D87D6;
+        height:50px;
+      }
+      #left-vis{
+        background:red;
+        height: 700px;
+        overflow:scroll;
+      }
+
+      #main-wrapper{
+        background:green;   
+      }
+      #main-nav{
+        background:yellow;
+        height:50px;
+      }
+      #main-vis{
+        background:white;
+        -height:650px;
+      }
+      #main-footer{
+        background:yellow;
+        height:50px;
+      }      
+      #right-wrapper{
+        background:black;   
+      }
+      
+    </style>
+</head>
+
+<body>
+    <div id="header" class="container-fluid bg-dark text-white" style="height: 60px">
+        <div id="">
+            <h3 style="margin: 0;">ChinaVis 2019</h3>
+            <em>A monitor system to analyse the real-time situation.</em>
+        </div>
+    </div>
+    <div id="container" class="container-fluid">
+        <div class="row">
+            <div id="left-wrapper" class="col-2">
+                <div id="left-content">
+                    <div id="left-nav">
+                        <button type="button" id="btn-delete-node" class="btn btn-primary">delete</button>
+                        <button type="button" id="btn-merge-node" class="btn btn-primary">merge</button>
+                        <input type="text" id="btn-merge-name" style="width: 90px" />
+                    </div>
+                    <div id="left-vis"></div>
+                </div>
+            </div>
+            <div id="main-wrapper" class="col-7">
+                <div id="main-nav">
+                    <button type="button" id="btn-grids" class="btn btn-info">grids</button>
+                    <button type="button" id="btn-bubbles" class="btn btn-info">bubbles</button>
+                    <button type="button" id="btn-areas" class="btn btn-info">areas</button>
+                    <!-- <button type="button" id="btn-parallelSet" class="btn btn-info">parallel set</button> -->
+                    <button type="button" id="btn-parallelCoord" class="btn btn-info">parallel coord</button>
+                    <button type="button" id="btn-boxplot" class="btn btn-info">box plot</button>
+                    <button type="button" id="btn-update" class="btn btn-primary">update</button>
+                    <button type="button" id="btn-save-data" class="btn btn-primary">save data</button>
+                </div>
+                <div id="main-vis"></div>
+            </div>
+            <div id="right-wrapper" class="col-3">
+                <div id="right-vis"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+    //读取树的数据
+    d3.json('data/grids/grids.json').then(function(grids_data) {
+        console.log('[load data] grids', grids_data);
+
+        const { grids, types } = grids_data;
+        dispatch.call('inittree', this, types);
+
+        //读取传感器数据并初始化表格
+        d3.csv('data/sensors/sensor.csv').then(function(sensors_data) {
+            console.log('[load data] sensors: ', sensors_data);
+            dispatch.call('initgrids', this, grids, sensors_data, types);
+
+            d3.select("#btn-grids")
+                .on('click', () => {
+                    dispatch.call('initgrids', this, grids, sensors_data, types);
+                })
+            sidByGid = gridMap(grids, sensors_data);
+        })
+
+        //读取日志数据
+        d3.json('data/sensors/sensor_day1_tmp.json').then(function(log_data) {
+            console.log('[load data] log_data', log_data);
+
+            const logsBySid = d3.map(log_data, d => d.s);
+
+            //绑定按钮
+            d3.select("#btn-areas")
+                .on('click', () => {
+                    dispatch.call('initareas', this, logsBySid, types);
+                })
+
+
+            d3.json('data/people/move_log_day1.json').then(function(move_data) {
+                // dispatch.call('initbubbles', this, logsBySid, move_data, types);
+
+
+                d3.select("#btn-bubbles")
+                    .on('click', () => {
+                        dispatch.call('initbubbles', this, logsBySid, move_data, types);
+                    })
+            })
+
+        })
+
+        //读取平行坐标系需要的数据
+        d3.json('data/people/sid_log_day1.json').then(function(move_and_stay){
+            // dispatch.call('initparacoord', this, move_and_stay, types);
+            dispatch.call('initboxplot', this, move_and_stay, types);
+
+            d3.select('#btn-parallelCoord')
+                .on('click', () => {
+                    dispatch.call('initparacoord', this, move_and_stay, types);
+                })
+            d3.select('#btn-boxplot')
+                .on('click', () => {
+                    dispatch.call('initboxplot', this, move_and_stay, types);
+                })
+        })
+
+        //监听事件
+        d3.select('#btn-save-data')
+            .on('click', () => { saveTree(grids_data) });
+    })
+
+
+    function saveTree(data) {
+        console.log('[function] saveTree', data.types);
+
+        data.types = data.types.raw();
+
+        saveToJson(data, 'grids');
+    }
+
+
+
+    //获得的根据格子的id获得对应sensorid的map
+    function gridMap(grids, sensors) {
+        const result = {};
+        grids.forEach(d => {
+            for (let s of sensors) {
+                if (s.x == d.x && s.y == d.y && +d.floor == +s.floor) {
+                    result[d.id] = s.sid;
+                    break;
+                }
+            }
+        })
+        return result;
+    }
+
+    //判断某些传感器是不是没有日志数据
+    function sensorsNoLog(sensors, log) {
+        for (let s of sensors) {
+            let flag = false;
+            for (let l of log) {
+                if (+l['s'] === +s['sid']) flag = true;
+            }
+            if (!flag) {
+                console.log(+s['sid']);
+            }
+        }
+
+    }
+    </script>
+</body>
+
+</html>
