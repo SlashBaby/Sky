@@ -1,17 +1,10 @@
 const grid = function() {
     dispatch.on('initgrids', (grids, sensors, tree) => {
         console.log('[event] init grid', grids, sensors);
-        dispatch.call('inittreemap', this, allpeople);
 
+        currentVis = 'grids'
         clearMainVis();
 
-        //add buttons
-        // d3.select('#main-footer')
-        //     .append('button')
-        //     .attr('class', 'btn btn-primary dom-grid')
-        //     .attr('id', 'btn-grid-save')
-        //     .text('保存数据')
-        //     .on('click', saveTree)
         if (d3.select('#main-footer').empty()) {
             d3.select('#main-wrapper')
                 .append('div')
@@ -138,7 +131,22 @@ const grid = function() {
                         .domain(d3.range(30))
                         .rangeRound([0, height]);
 
-                    const color = d3.scaleOrdinal(d3.schemeCategory10);
+                    const alltype = []
+                    for(let g of grids){
+                        const t = g.type;
+                        if(alltype.indexOf(t) === -1){
+                            alltype.push(t);
+                        }
+                    }
+
+                    const range = [];
+                    const step = 1 / alltype.length;
+                    for(let i = 0; i < 1; i += step){
+                        range.push(d3.interpolateSpectral(i))
+                    }
+                    const color = d3.scaleOrdinal()
+                        .domain(alltype)
+                        .range(range);
 
                     g.select(".grid-xAixs")
                         .call(d3.axisTop(x).tickSize(0))
@@ -175,7 +183,7 @@ const grid = function() {
                         const rectUpdate = rect.merge(rectEnter)
                             .attr('stroke', 'black')
                             .attr('opacity', d => d.isSelected ? 0.4 : 1)
-                            .attr('fill', d => color(d.type));
+                            .attr('fill', d => ((d.type === '第一层') || (d.type === '第二层')) ? 'white' : color(d.type));
 
                         //circle
                         const circleEnter = circle.enter().append('circle')

@@ -13,6 +13,7 @@ const dispatch = d3.dispatch(
     'initparacoord',
     'initboxplot',
     'inittreemap',
+    'updatecurrent'
 );
 
 const leftDimensions = {
@@ -26,7 +27,7 @@ leftDimensions.content = {
 };
 
 const mainDimensions = {
-    container: { 'width': 950, 'height': 650 },
+    container: { 'width': 1370, 'height': 650 },
     margin: { 'left': 30, 'top': 30, 'right': 30, 'bottom': 30 },
 };
 
@@ -52,11 +53,13 @@ let typeNameBySid;
 
 function clearMainVis() {
     $('#main-vis').children().remove();
+    $('#main-vis').removeAttr('_echarts_instance_');
     $('#main-footer').children().remove();
 }
 
-function clearRightVis(){
-    $('#right-vis').children().remove();
+function clearLeftVis() {
+    $('#left-vis').children().remove();
+    $('#left-footer').children().remove();
 }
 
 function saveToJson(data, filename) {
@@ -73,3 +76,13 @@ let markTimelist = [];
 let allpeople = [];
 
 let peopleById = d3.map();
+
+let currentVis;
+
+let currentLeftVis;
+
+//平行坐标系的时间
+let maxTime = 64858,
+    minTime = 25240;
+let startTime = minTime,
+    endTime = maxTime;

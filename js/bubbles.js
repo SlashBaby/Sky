@@ -1,9 +1,9 @@
 const bubbles = function() {
     dispatch.on('initbubbles', (logsBySid, move_data, types) => {
         console.log('[event] initbubbles', move_data);
+        currentVis = 'bubbles';
         //清空画布
         clearMainVis();
-        clearRightVis();
         if(d3.select('#main-footer').empty()){
             d3.select('#main-wrapper')
             .append('div')
@@ -95,12 +95,14 @@ const bubbles = function() {
         const nodes = spaces.map(d => {
             const name = d.name;
             const population = [];
+            const area = d.gridIdList.length;
             for (let key in d.dataByTime) {
                 population.push([+key, d.dataByTime[key]])
             }
             return {
                 name: name,
-                population: population
+                population: population,
+                area: area
             }
         });
 
@@ -212,7 +214,7 @@ const bubbles = function() {
                         colorScale = d3.scaleOrdinal()
                         .domain(d.nodes.map(d => d.name))
                         .range(d3.schemeCategory10),
-                        radiusScale = d3.scaleSqrt([0, 3000], [1, 200]),
+                        radiusScale = d3.scaleSqrt([0, 3000], [1, 150]),
                         scrollScale = d3.scaleLinear([0, 740], [startTime, endTime]);
 
                     //nodes
@@ -254,7 +256,7 @@ const bubbles = function() {
                     //scroll bar
                     const scroll = svg.append('g')
                         .attr('class', 'scroll')
-                        .attr('transform', `translate(${80}, ${height + 20})`);
+                        .attr('transform', `translate(${500}, ${height + 20})`);
 
                     scroll.append('rect')
                         .attr('class', 'scroll-bar')
@@ -521,7 +523,6 @@ const bubbles = function() {
                         }
 
                         //根据时间获得links数据
-                        // alert()
                         const links = d.links.map(d => {
                             const source = d[0],
                                 target = d[1];

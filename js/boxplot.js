@@ -2,10 +2,12 @@ const boxplot = function() {
     dispatch.on('initboxplot', (move_and_stay, types) => {
         console.log('initboxplot', move_and_stay);
         clearMainVis();
+        currentVis = 'boxplot'
 
         //获得需要聚类的空间
         let spaces = types.selectedNodeList();
         if (spaces.length === 0) spaces = types.leaves();
+        console.log(spaces)
 
         //根据sid找到type
         typeNameBySid = d3.map();
@@ -112,20 +114,13 @@ const boxplot = function() {
         console.log(dataMove)
         const { container, margin, content } = mainDimensions;
 
-        d3.select('#main-vis')
-            .append('div')
-            .attr('id', 'boxplot-vis')
-            .style('height', `${content.height}px`)
-            .style('width', `${content.width}px`);
-
         if (d3.select('#main-footer').empty()) {
             d3.select('#main-wrapper')
                 .append('div')
                 .attr('id', 'main-footer')
         }
 
-        var myChart = echarts.init(document.getElementById('boxplot-vis'));
-
+        var myChart = echarts.init(document.getElementById('main-vis'));
         var dataBox = echarts.dataTool.prepareBoxplotData(dataStay);
 
 
@@ -214,7 +209,6 @@ const boxplot = function() {
                 value = o[1];
             const key = keyByIndex.get(i);
             const m = idByStayTime[key];
-            // console.log(key, value, m.size())
             outerPid = [...outerPid, ...m.get(value)];
         }
 

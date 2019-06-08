@@ -1,6 +1,9 @@
 const tree = function() {
     dispatch.on('inittree', tree => {
         console.log('[event]: init tree', tree);
+        clearLeftVis();
+        // cuurentLeftVis = 'tree';
+        currentLeftVis = 'tree';
 
         const { container, margin, content } = leftDimensions;
 
@@ -29,7 +32,9 @@ const tree = function() {
             .attr('cursor', 'pointer');
 
         //some button listener
-        d3.select('#btn-merge-node')
+        d3.select('#left-footer')
+            .append('button')
+            .attr('class', 'btn btn-primary')
             .on('click', () => {
                 console.log('[event] merge node');
                 const list = tree.selectedNodeList();
@@ -42,13 +47,23 @@ const tree = function() {
                 $('#btn-merge-name').val("");
                 tree.mergeNode(nodeName, list);
             })
+            .text('merge')
 
-        d3.select('#btn-delete-node')
+        d3.select('#left-footer')
+            .append('button')
+            .attr('class', 'btn btn-primary')
             .on('click', () => {
                 console.log('[event] delete node');
                 const list = tree.selectedNodeList();
                 tree.deleteNode(list);
             })
+            .text('delete')
+
+        d3.select('#left-footer')
+            .append('input')
+            .attr('type', 'text')
+            .attr('id', 'btn-merge-name')
+            .style('width', '90px')
 
         //监听事件
         dispatch.on('addnode', (nodeName, gridIdList) => {
@@ -111,7 +126,9 @@ const tree = function() {
                 d.children = d.children.filter(d => nodeList.indexOf(d) == -1);
             })
             tree.update();
-            dispatch.call('update', this, tree);
+            if (currentVis === 'grids') {
+                dispatch.call('update', this, tree);
+            }
             alert("删除节点成功");
         }
 
@@ -128,12 +145,17 @@ const tree = function() {
 
             const father = tree.findById(+set.values()[0]);
 
+            let newlist = [];
+            for (let l of nodeList) {
+                newlist = [...newlist, ...l.gridIdList];
+            }
+            console.log(newlist)
             const node = {
                 'name': nodeName,
                 'id': tree.nextId(),
                 'children': nodeList,
                 'father': father.id,
-                'gridIdList': nodeList.reduce((total, d) => [...total.gridIdList, ...d.gridIdList])
+                'gridIdList': newlist
             }
 
             father.children = father.children.filter(d => {
@@ -148,7 +170,9 @@ const tree = function() {
             nodeList.forEach(d => d.father = node.id);
 
             tree.update();
-            dispatch.call('update', this, tree);
+            if (cuurentVis === 'grids') {
+                dispatch.call('update', this, tree);
+            }
             alert('合并成功');
         }
 
@@ -372,7 +396,9 @@ const tree = function() {
                             .on('click', d => {
                                 d.children = d.children ? null : d._children;
                                 update(d);
-                                dispatch.call('update', this, tree);
+                                if (currentVis === 'grids') {
+                                    dispatch.call('update', this, tree);
+                                }
                             });
 
                         nodeEnter.append('rect')
@@ -383,7 +409,9 @@ const tree = function() {
                             .on('click', d => {
                                 d.isSelected = !d.isSelected;
                                 update(d);
-                                dispatch.call('update', this, tree);
+                                if (currentVis === 'grids') {
+                                    dispatch.call('update', this, tree);
+                                }
                             });
 
 

@@ -2,6 +2,13 @@ const paraCoord = function() {
     dispatch.on('initparacoord', (move_and_stay, types) => {
         console.log('initparacoord', move_and_stay);
         clearMainVis();
+        currentVis = 'paraCoord';
+
+        //监听更新事件
+        dispatch.on('updatecurrent.paraCoord', () => {
+            if (currentVis === 'paraCoord')
+                dispatch.call('initparacoord', this, move_and_stay, types);
+        })
 
         //获得需要聚类的空间
         let spaces = types.selectedNodeList();
@@ -30,15 +37,21 @@ const paraCoord = function() {
             indexByKey.set(d, i);
         })
 
+
         for (let p of move_and_stay) {
             const id = p.id,
                 log = p.l;
             const list = {}; //记录当前的room是否出现过
 
+            //便利每一条log
             for (let i = 0; i < log.length; i++) {
                 const l = log[i];
                 const sid = l[1];
                 const time = l[0];
+
+                //更新最大和最小的时间
+                // maxTime = d3.max([maxTime, time]);
+                // minTime = d3.min([minTime, time]);
                 const type = typeNameBySid.get(sid);
 
                 if (!list[type]) {
@@ -47,9 +60,13 @@ const paraCoord = function() {
                         'move': 0
                     }
                 }
+                //筛选时间数据
+                if (time > endTime || time < startTime)
+                    continue;
+
                 if (i === 0) {
                     //从外面进来
-                    list[type].move += 1;   
+                    list[type].move += 1;
                     continue;
                 }
 
@@ -85,16 +102,11 @@ const paraCoord = function() {
 
         console.log('dataMove', dataMove);
         console.log('dataStay', dataStay);
+        console.log('max', maxTime, 'min', minTime);
 
         //开始可视化
         // 基于准备好的dom，初始化echarts实例
         const { container, margin, content } = mainDimensions;
-
-        d3.select('#main-vis')
-            .append('div')
-            .attr('id', 'paraCoord-vis')
-            .style('height', `${content.height}px`)
-            .style('width', `${content.width}px`);
 
         if (d3.select('#main-footer').empty()) {
             d3.select('#main-wrapper')
@@ -103,7 +115,7 @@ const paraCoord = function() {
         }
 
 
-        var myChart = echarts.init(document.getElementById('paraCoord-vis'));
+        var myChart = echarts.init(document.getElementById('main-vis'));
 
         var lineStyle = {
             normal: {
@@ -138,7 +150,71 @@ const paraCoord = function() {
             }
         }
 
+        //添加筛选框，一个起始时间一个结束时间
+        d3.select('#main-footer')
+            .append('label')
+            .text('起始时间')
+
+        const formatTime = time => {
+            const h = Math.floor(time / 3600);
+            const m = Math.floor((time % 3600) / 60);
+            const s = (time % 3600) % 60;
+            return `${wrap(h)}:${wrap(m)}:${wrap(s)}`;
+
+            function wrap(n) {
+                return n < 10 ? `0${n}` : `${n}`;
+            }
+        }
+
+        const timeByValue = d3.map();
+        const timelist = [];
+        //30分钟为间隔
+        const step = 60 * 30;
+        for (let i = minTime; i < maxTime - step; i += step) {
+            const t = formatTime(i);
+            // console.log(i, t);
+            timeByValue.set(t, i);
+            timelist.push(t);
+        }
+
+        const t = formatTime(maxTime);
+        timeByValue.set(t, maxTime);
+        timelist.push(t);
+
+        const select1 = d3.select('#main-footer')
+            .append('select')
+            .attr('id', 'select-startTime')
+
+        select1.selectAll('option')
+            .data(timelist)
+            .join('option')
+            .text(d => d);
+
+
+        d3.select('#main-footer')
+            .append('label')
+            .text('结束时间')
+
+        const select2 = d3.select('#main-footer')
+            .append('select')
+            .attr('id', 'select-endTime');
+
+        select2.selectAll('option')
+            .data(timelist.reverse())
+            .join('option')
+            .text(d => d);
+
+        let selectedlist = [];
+
+
+        //选择当前的起始和结束时间
+        $("#select-startTime").val(formatTime(startTime));
+        $("#select-endTime").val(formatTime(endTime));
+
         //添加选择
+        d3.select('#main-footer')
+            .append('label')
+            .text('种类')
         const select = d3.select('#main-footer')
             .append('select')
             .attr('id', 'select-paraCoord')
@@ -148,6 +224,14 @@ const paraCoord = function() {
 
         select.append('option')
             .text('进入次数')
+            
+        d3.select('#main-footer')
+            .append('button')
+            .attr('class', 'btn btn-primary')
+            .text('显示选择/隐藏的人')
+            .on('click', () => {
+                console.log('隐藏或者选择')
+            })
 
         //绑定事件
         $("#select-paraCoord").change(function() {
@@ -163,10 +247,33 @@ const paraCoord = function() {
             myChart.setOption(option);
         });
 
+        $("#select-startTime").change(function() {
+            console.log('change start time');
+            const _endTime = timeByValue.get($("#select-endTime").val());
+            const _startTime = timeByValue.get($(this).val());
+            if (_startTime > _endTime) {
+                alert('开始时间不能大于结束时间');
+                return;
+            }
+            startTime = _startTime;
+        })
+
+        $("#select-endTime").change(function() {
+            console.log('change end time');
+            const _startTime = timeByValue.get($("#select-startTime").val());
+            const _endTime = timeByValue.get($(this).val());
+            if (_startTime > _endTime) {
+                alert('开始时间不能大于结束时间');
+                return;
+            }
+            endTime = _endTime;
+        })
+
         const option = getOptionByType(dataStay, maxStay);
 
         //获得选中的值
         myChart.on('axisareaselected', function() {
+            console.log(myChart.getModel().getSeries());
             var series0 = myChart.getModel().getSeries()[0];
             // var series1 = myChart.getModel().getSeries()[1];
             var indices0 = series0.getRawIndicesByActiveState('active');
@@ -194,7 +301,7 @@ const paraCoord = function() {
                 },
                 parallel: {
                     left: '5%',
-                    right: '18%',
+                    right: '5%',
                     bottom: 100,
                     parallelAxisDefault: {
                         type: 'value',

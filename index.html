@@ -46,8 +46,8 @@
       }
       #left-vis{
         background:red;
-        height: 700px;
-        overflow:scroll;
+        height: 650px;
+        overflow:hidden;
       }
 
       #main-wrapper{
@@ -59,7 +59,7 @@
       }
       #main-vis{
         background:white;
-        -height:650px;
+        height:650px;
       }
       #main-footer{
         background:yellow;
@@ -84,18 +84,19 @@
             <div id="left-wrapper" class="col-2">
                 <div id="left-content">
                     <div id="left-nav">
-                        <button type="button" id="btn-delete-node" class="btn btn-primary">delete</button>
-                        <button type="button" id="btn-merge-node" class="btn btn-primary">merge</button>
-                        <input type="text" id="btn-merge-name" style="width: 90px" />
+                        <button type="button" id="btn-tree" class="btn btn-primary">空间分类</button>
+                        <button type="button" id="btn-map" class="btn btn-primary">人员分类</button>
                     </div>
                     <div id="left-vis"></div>
+                    <div id="left-footer">
+                    </div>
                 </div>
             </div>
-            <div id="main-wrapper" class="col-7">
+            <div id="main-wrapper" class="col-10">
                 <div id="main-nav">
                     <button type="button" id="btn-grids" class="btn btn-info">grids</button>
                     <button type="button" id="btn-bubbles" class="btn btn-info">bubbles</button>
-                    <button type="button" id="btn-areas" class="btn btn-info">areas</button>
+                    <!-- <button type="button" id="btn-areas" class="btn btn-info">areas</button> -->
                     <!-- <button type="button" id="btn-parallelSet" class="btn btn-info">parallel set</button> -->
                     <button type="button" id="btn-parallelCoord" class="btn btn-info">parallel coord</button>
                     <button type="button" id="btn-boxplot" class="btn btn-info">box plot</button>
@@ -104,15 +105,15 @@
                 </div>
                 <div id="main-vis"></div>
             </div>
-            <div id="right-wrapper" class="col-3">
+            <!-- <div id="right-wrapper" class="col-3">
                 <div id="right-vis">
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <script>
     //读取树的数据
-    d3.json('data/grids/grids_2019_6_8 下午4_21_18.json').then(function(grids_data) {
+    d3.json('data/grids/grids_2019_6_8 下午9_44_05.json').then(function(grids_data) {
         console.log('[load data] grids', grids_data);
 
         const { grids, types } = grids_data;
@@ -124,11 +125,20 @@
             //初始化树
             dispatch.call('inittree', this, types);
 
+            d3.select("#btn-map")
+                .on('click', () => {
+                    dispatch.call('inittreemap', this, allpeople);
+                })
+            d3.select('#btn-tree')
+                .on('click', () => {
+                    dispatch.call('inittree', this, types);
+                })
+
             //初始化map
-            for(let p of allpeople){
+            for (let p of allpeople) {
                 peopleById.set(p.id, p);
             }
-            
+
 
             //读取传感器数据并初始化表格
             d3.csv('data/sensors/sensor.csv').then(function(sensors_data) {
@@ -191,7 +201,20 @@
 
         //监听事件
         d3.select('#btn-save-data')
-            .on('click', () => { saveTree(grids_data) });
+            .on('click', () => {
+                console.log('save')
+                if (currentLeftVis === 'tree') {
+                    saveTree(grids_data)
+                } else if (currentLeftVis === 'treemap'){
+                    saveToJson(allpeople, 'people')
+                }
+
+            });
+        d3.select('#btn-update')
+            .on('click', () => {
+                console.log('update');
+                dispatch.call('updatecurrent', this);
+            })
     })
 
 
