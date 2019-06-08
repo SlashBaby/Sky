@@ -26,9 +26,11 @@ const paraCoord = function() {
             })
         });
 
+        let currentType = '停留时间';
         //处理数据，让平行坐标系可以用
         const dataMove = [],
             dataStay = [];
+        const idByIndex = d3.map();
 
         //给每一个种类确定一个index
         const keys = spaces.map(d => d.name);
@@ -96,6 +98,7 @@ const paraCoord = function() {
                 dMove[index] += list[k].move;
                 dStay[index] += list[k].stay;
             }
+            idByIndex.set(dataMove.length, id);
             dataMove.push(dMove);
             dataStay.push(dStay);
         }
@@ -224,13 +227,18 @@ const paraCoord = function() {
 
         select.append('option')
             .text('进入次数')
-            
+
         d3.select('#main-footer')
             .append('button')
             .attr('class', 'btn btn-primary')
-            .text('显示选择/隐藏的人')
+            .text('显示选择人')
             .on('click', () => {
-                console.log('隐藏或者选择')
+                console.log('选择', console.log(selectedlist));
+                selectedlist.forEach(d => {
+                    const p = peopleById.get(d);
+                    p.isSelected = true;
+                })
+                dispatch.call('inittreemap', this, allpeople);
             })
 
         //绑定事件
@@ -240,9 +248,10 @@ const paraCoord = function() {
             let option;
             if (val === '停留时间') {
                 option = getOptionByType(dataStay, maxStay);
+                currentType = '停留时间';
             } else {
                 option = getOptionByType(dataMove, maxMove);
-
+                currentType = '移动次数';
             }
             myChart.setOption(option);
         });
@@ -279,6 +288,8 @@ const paraCoord = function() {
             var indices0 = series0.getRawIndicesByActiveState('active');
             // var indices1 = series1.getRawIndicesByActiveState('active');
             console.log(indices0);
+            if (indices0.length > 0)
+                selectedlist = indices0.map(d => idByIndex.get(d));
         });
 
 
