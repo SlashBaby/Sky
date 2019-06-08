@@ -11,6 +11,11 @@ const grid = function() {
         //     .attr('id', 'btn-grid-save')
         //     .text('保存数据')
         //     .on('click', saveTree)
+        if (d3.select('#main-footer').empty()) {
+            d3.select('#main-wrapper')
+                .append('div')
+                .attr('id', 'main-footer')
+        }
 
         d3.select('#main-footer')
             .append('button')
@@ -111,7 +116,7 @@ const grid = function() {
             dispatch.call('addnode', this, nodeName, list.map(d => d.id));
         }
 
-        
+
 
         function gridChart() {
             let width, height;

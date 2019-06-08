@@ -220,14 +220,14 @@ const bubbles = function() {
                     computeLayout(nodes, links);
 
                     //links
-                    const link = svg.append("g")
-                        .attr("stroke-opacity", 0.6)
-                        .selectAll("path")
-                        .data(links)
-                        .join("path")
-                        .attr('class', 'link')
-                        .attr("stroke-width", 2)
-                        .call(linksUpdate)
+                    // const link = svg.append("g")
+                    //     .attr("stroke-opacity", 0.6)
+                    //     .selectAll("path")
+                    //     .data(links)
+                    //     .join("path")
+                    //     .attr('class', 'link')
+                    //     .attr("stroke-width", 2)
+                    //     .call(linksUpdate)
 
                     //dots
                     const dot = svg.append('g')
@@ -425,6 +425,7 @@ const bubbles = function() {
                     }
 
                     function computeLayout(nodes, links) {
+
                         //compute radius
                         nodes.forEach(d => {
                             d.r = radiusScale(radius(d));
@@ -437,7 +438,7 @@ const bubbles = function() {
                         const simulation = d3.forceSimulation(nodes)
                             .force("center", d3.forceCenter(width / 2, height / 2))
                             .force("collide", forceCollide())
-                            .force("link", d3.forceLink(links).id(d => d.name));
+                            // .force("link", d3.forceLink(links).id(d => d.name));
 
 
                         //计算新的布局
@@ -454,8 +455,8 @@ const bubbles = function() {
                         dot.data(nodes, key)
                             .call(position);
 
-                        link.data(links, d => d.index)
-                            .call(linksUpdate)
+                        // link.data(links, d => d.index)
+                            //.call(linksUpdate)
 
                         dot.select('title').text(d => `${d.name}:${Math.floor(d.population)}`);
 
@@ -520,6 +521,7 @@ const bubbles = function() {
                         }
 
                         //根据时间获得links数据
+                        // alert()
                         const links = d.links.map(d => {
                             const source = d[0],
                                 target = d[1];
