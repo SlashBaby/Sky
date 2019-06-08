@@ -1,6 +1,7 @@
 const grid = function() {
     dispatch.on('initgrids', (grids, sensors, tree) => {
         console.log('[event] init grid', grids, sensors);
+        dispatch.call('inittreemap', this, allpeople);
 
         clearMainVis();
 

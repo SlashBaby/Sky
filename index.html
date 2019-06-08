@@ -112,7 +112,7 @@
     </div>
     <script>
     //读取树的数据
-    d3.json('data/grids/grids.json').then(function(grids_data) {
+    d3.json('data/grids/grids_2019_6_8 下午4_21_18.json').then(function(grids_data) {
         console.log('[load data] grids', grids_data);
 
         const { grids, types } = grids_data;
@@ -123,6 +123,12 @@
             allpeople = people_data;
             //初始化树
             dispatch.call('inittree', this, types);
+
+            //初始化map
+            for(let p of allpeople){
+                peopleById.set(p.id, p);
+            }
+            
 
             //读取传感器数据并初始化表格
             d3.csv('data/sensors/sensor.csv').then(function(sensors_data) {
@@ -136,7 +142,7 @@
                 sidByGid = gridMap(grids, sensors_data);
 
                 //初始化人
-                dispatch.call('inittreemap', this, allpeople);
+                // dispatch.call('inittreemap', this, allpeople);
             })
 
         })

@@ -171,7 +171,7 @@ const tree = function() {
         }
 
         tree.log = () => {
-            tree.eachBefore(d => console.log(d));
+            // tree.eachBefore(d => console.log(d));
         }
 
         //获得下一个节点的id

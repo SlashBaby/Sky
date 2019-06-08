@@ -71,3 +71,5 @@ let markTimelist = [];
 
 
 let allpeople = [];
+
+let peopleById = d3.map();

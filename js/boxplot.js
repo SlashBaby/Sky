@@ -218,8 +218,17 @@ const boxplot = function() {
             outerPid = [...outerPid, ...m.get(value)];
         }
 
+        allpeople.forEach(d => d.isSelected = false);
+        //更新people
+        for(let id of outerPid){
+        	const p = peopleById.get(id);
+        	p.isSelected = true;
+        }
+
+        dispatch.call('inittreemap', this, allpeople);
+
         //获得所有有问题的人的sid
-        console.log(outerPid);
+        // console.log(outerPid);
         myChart.setOption(option);
     })
 }();
