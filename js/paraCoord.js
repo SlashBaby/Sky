@@ -32,27 +32,40 @@ const paraCoord = function() {
 
         for (let p of move_and_stay) {
             const id = p.id,
-                sensors = p.sensors;
-            const list = {};
-            for (let s of sensors) {
-                const sid = s[0],
-                    stay = s[1],
-                    move = s[2];
+                log = p.l;
+            const list = {}; //记录当前的room是否出现过
+
+            for (let i = 0; i < log.length; i++) {
+                const l = log[i];
+                const sid = l[1];
+                const time = l[0];
                 const type = typeNameBySid.get(sid);
-                if (list[type]) {
-                    let sum = 0;
-                    stay.forEach(d => sum += d[1]);
-                    list[type].stay += sum;
-                    list[type].move += move.length;
-                } else {
-                    let sum = 0;
-                    stay.forEach(d => sum += d[1]);
+
+                if (!list[type]) {
                     list[type] = {
-                        'stay': sum,
-                        'move': move.length
+                        'stay': 0,
+                        'move': 0
                     }
                 }
+                if (i === 0) {
+                    //从外面进来
+                    list[type].move += 1;   
+                    continue;
+                }
+
+
+                const pl = log[i - 1];
+                const ptime = pl[0];
+                const psid = pl[1];
+                const ptype = typeNameBySid.get(psid);
+
+                list[ptype].stay += time - ptime;
+
+
+                if (type != ptype) //如果上一个时间的room和当前room的类型不同
+                    list[type].move += 1;
             }
+
 
             const dMove = [],
                 dStay = [];
@@ -90,20 +103,7 @@ const paraCoord = function() {
         }
 
 
-        var myChart = echarts.init(document.getElementById('paraCoord-vis'), null, { renderer: 'svg' });
-
-        // 指定图表的配置项和数据
-
-        var schema = [
-            { name: 'date', index: 0, text: '日期' },
-            { name: 'AQIindex', index: 1, text: 'AQI' },
-            { name: 'PM25', index: 2, text: 'PM2.5' },
-            { name: 'PM10', index: 3, text: 'PM10' },
-            { name: 'CO', index: 4, text: ' CO' },
-            { name: 'NO2', index: 5, text: 'NO2' },
-            { name: 'SO2', index: 6, text: 'SO2' },
-            { name: '等级', index: 7, text: '等级' }
-        ];
+        var myChart = echarts.init(document.getElementById('paraCoord-vis'));
 
         var lineStyle = {
             normal: {
@@ -147,7 +147,7 @@ const paraCoord = function() {
             .text('停留时间')
 
         select.append('option')
-            .text('移动次数')
+            .text('进入次数')
 
         //绑定事件
         $("#select-paraCoord").change(function() {
