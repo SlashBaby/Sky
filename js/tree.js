@@ -94,7 +94,7 @@ const tree = function() {
                 return flag;
             }
 
-            //dispatch.call('update', this, tree);
+            dispatch.call('update', this, tree);
 
         }
 
@@ -111,7 +111,7 @@ const tree = function() {
                 d.children = d.children.filter(d => nodeList.indexOf(d) == -1);
             })
             tree.update();
-            //dispatch.call('update', this, tree);
+            dispatch.call('update', this, tree);
             alert("删除节点成功");
         }
 
@@ -148,7 +148,7 @@ const tree = function() {
             nodeList.forEach(d => d.father = node.id);
 
             tree.update();
-            //dispatch.call('update', this, tree);
+            dispatch.call('update', this, tree);
             alert('合并成功');
         }
 
@@ -372,7 +372,7 @@ const tree = function() {
                             .on('click', d => {
                                 d.children = d.children ? null : d._children;
                                 update(d);
-                                //dispatch.call('update', this, tree);
+                                dispatch.call('update', this, tree);
                             });
 
                         nodeEnter.append('rect')
@@ -383,7 +383,7 @@ const tree = function() {
                             .on('click', d => {
                                 d.isSelected = !d.isSelected;
                                 update(d);
-                                //dispatch.call('update', this, tree);
+                                dispatch.call('update', this, tree);
                             });
 
 
