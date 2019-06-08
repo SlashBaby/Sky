@@ -11,7 +11,8 @@ const dispatch = d3.dispatch(
     'initareas',
     'initbubbles',
     'initparacoord',
-    'initboxplot'
+    'initboxplot',
+    'inittreemap',
 );
 
 const leftDimensions = {
@@ -32,6 +33,16 @@ const mainDimensions = {
 mainDimensions.content = {
     'width': mainDimensions.container.width - mainDimensions.margin.left - mainDimensions.margin.right,
     'height': mainDimensions.container.height - mainDimensions.margin.top - mainDimensions.margin.bottom
+};
+
+const rightDimensions = {
+    container: { 'width': 400, 'height': 730 },
+    margin: { 'left': 10, 'top': 10, 'right': 10, 'bottom': 10 },
+};
+
+rightDimensions.content = {
+    'width': leftDimensions.container.width - leftDimensions.margin.left - leftDimensions.margin.right,
+    'height': leftDimensions.container.height - leftDimensions.margin.top - leftDimensions.margin.bottom
 };
 
 
@@ -57,3 +68,6 @@ function saveToJson(data, filename) {
 
 
 let markTimelist = [];
+
+
+let allpeople = [];

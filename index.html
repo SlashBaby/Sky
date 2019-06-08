@@ -16,6 +16,7 @@
     <script src="assets/d3.v5.min.js"></script>
     <script src="assets/bootstrap.min.js"></script>
     <script src="assets/echarts.min.js"></script>
+    <script src="assets/dataTool.js"></script>
     <script src="js/globalVar.js"></script>
     <script src="js/grids.js"></script>
     <script src="js/tree.js"></script>
@@ -23,6 +24,7 @@
     <script src="js/areas.js"></script>
     <script src="js/paraCoord.js"></script>
     <script src="js/boxplot.js"></script>
+    <script src="js/treemap.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega@5.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@3.3.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@4.2.0"></script>
@@ -103,7 +105,8 @@
                 <div id="main-vis"></div>
             </div>
             <div id="right-wrapper" class="col-3">
-                <div id="right-vis"></div>
+                <div id="right-vis">
+                </div>
             </div>
         </div>
     </div>
@@ -113,19 +116,32 @@
         console.log('[load data] grids', grids_data);
 
         const { grids, types } = grids_data;
-        dispatch.call('inittree', this, types);
 
-        //读取传感器数据并初始化表格
-        d3.csv('data/sensors/sensor.csv').then(function(sensors_data) {
-            console.log('[load data] sensors: ', sensors_data);
-            dispatch.call('initgrids', this, grids, sensors_data, types);
 
-            d3.select("#btn-grids")
-                .on('click', () => {
-                    dispatch.call('initgrids', this, grids, sensors_data, types);
-                })
-            sidByGid = gridMap(grids, sensors_data);
+        //读取人的数据
+        d3.json('data/people/people.json').then(function(people_data) {
+            allpeople = people_data;
+            //初始化树
+            dispatch.call('inittree', this, types);
+
+            //读取传感器数据并初始化表格
+            d3.csv('data/sensors/sensor.csv').then(function(sensors_data) {
+                console.log('[load data] sensors: ', sensors_data);
+                dispatch.call('initgrids', this, grids, sensors_data, types);
+
+                d3.select("#btn-grids")
+                    .on('click', () => {
+                        dispatch.call('initgrids', this, grids, sensors_data, types);
+                    })
+                sidByGid = gridMap(grids, sensors_data);
+
+                //初始化人
+                dispatch.call('inittreemap', this, allpeople);
+            })
+
         })
+
+
 
         //读取日志数据
         d3.json('data/sensors/sensor_day1_tmp.json').then(function(log_data) {
@@ -143,7 +159,6 @@
             d3.json('data/people/move_log_day1.json').then(function(move_data) {
                 // dispatch.call('initbubbles', this, logsBySid, move_data, types);
 
-
                 d3.select("#btn-bubbles")
                     .on('click', () => {
                         dispatch.call('initbubbles', this, logsBySid, move_data, types);
@@ -153,12 +168,13 @@
         })
 
         //读取平行坐标系需要的数据
-        d3.json('data/people/sid_log_day1.json').then(function(move_and_stay){
+        d3.json('data/people/sid_log_day1.json').then(function(move_and_stay) {
             // dispatch.call('initparacoord', this, move_and_stay, types);
-            dispatch.call('initboxplot', this, move_and_stay, types);
+            // dispatch.call('initboxplot', this, move_and_stay, types);
 
             d3.select('#btn-parallelCoord')
                 .on('click', () => {
+                    console.log('hhh');
                     dispatch.call('initparacoord', this, move_and_stay, types);
                 })
             d3.select('#btn-boxplot')

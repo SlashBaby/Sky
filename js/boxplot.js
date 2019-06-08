@@ -19,67 +19,207 @@ const boxplot = function() {
             })
         });
 
+        const data = [];
 
-        //获得每个sensor的停留时间和移动次数
-        // const data = [];
-        const indexByTypeName = d3.map();
-        const list = {};
+        //根据停留时间确定id
+        const idByStayTime = {}; //d3.map();
+
         for (let p of move_and_stay) {
             const id = p.id,
-                sensors = p.sensors;
+                log = p.l;
+            const list = {}; //每个人的数据
 
-            for (let s of sensors) {
-                const sid = s[0],
-                    stay = s[1],
-                    move = s[2];
+            for (let i = 0; i < log.length; i++) {
+                const l = log[i];
+                const sid = l[1];
+                const time = l[0];
                 const type = typeNameBySid.get(sid);
-                if (list[type]) {
-                    let sum = 0;
-                    stay.forEach(d => sum += d[1]);
-                    list[type].stay += sum;
-                    list[type].move += move.length;
-                } else {
-                    let sum = 0;
-                    stay.forEach(d => sum += d[1]);
+
+                if (!list[type]) {
                     list[type] = {
-                        'stay': sum,
-                        'move': move.length
+                        'stay': 0,
+                        'move': 0
                     }
                 }
+                if (!data[type]) {
+                    data[type] = {
+                        'move': [],
+                        'stay': []
+                    }
+                }
+
+                if (!idByStayTime[type]) {
+                    idByStayTime[type] = d3.map();
+                }
+                if (i === 0) {
+                    //从外面进来
+                    list[type].move += 1;
+                    continue;
+                }
+
+
+                const pl = log[i - 1];
+                const ptime = pl[0];
+                const psid = pl[1];
+                const ptype = typeNameBySid.get(psid);
+
+
+                if (type != ptype) { //如果上一个时间的room和当前room的类型不同，离开了房间
+                    list[type].move += 1;
+                    const stayTime = list[ptype].stay;
+                    data[ptype].stay.push(stayTime);
+
+                    //添加进map
+                    const idlist = idByStayTime[ptype].get(stayTime);
+                    if (!idlist) {
+                        idByStayTime[ptype].set(stayTime, [id]);
+                    } else {
+                        idlist.push(id);
+                    }
+
+                } else {
+                    list[ptype].stay += (time - ptime);
+                }
             }
+
+
+            for (let k in list) {
+                if (!data[k]) {
+                    data[k] = {
+                        'move': [],
+                        'stay': []
+                    }
+                }
+
+                data[k].move.push(list[k].move);
+            }
+
         }
 
-        console.log(list);
+        console.log('data', data);
+
+        const dataStay = [],
+            dataMove = [];
+        const keyByIndex = d3.map();
+        let index = -1;
+        for (let k in data) {
+            keyByIndex.set(++index, k);
+            dataStay.push(data[k].stay);
+            dataMove.push(data[k].move);
+        }
+
+        console.log(dataStay)
+        console.log(dataMove)
+        const { container, margin, content } = mainDimensions;
+
+        d3.select('#main-vis')
+            .append('div')
+            .attr('id', 'boxplot-vis')
+            .style('height', `${content.height}px`)
+            .style('width', `${content.width}px`);
+
+        if (d3.select('#main-footer').empty()) {
+            d3.select('#main-wrapper')
+                .append('div')
+                .attr('id', 'main-footer')
+        }
+
+        var myChart = echarts.init(document.getElementById('boxplot-vis'));
+
+        var dataBox = echarts.dataTool.prepareBoxplotData(dataStay);
 
 
-        //boxplot
-        d3.json('../data/test.json').then(function(data) {
-            console.log(data);
-            var chart = new G2.Chart({
-                container: 'main-vis',
-                forceFit: true,
-                height: 600,
-                padding: [40, 80, 80, 80]
-            });
-            chart.source(data, {
-                carat: {
-                    sync: true
-                },
-                price: {
-                    sync: true,
-                    tickCount: 3
-                },
-                clarity: {
-                    sync: true
+        const option = {
+            title: [{
+                text: '停留时长',
+                left: 'center',
+            }, ],
+            tooltip: {
+                trigger: 'item',
+                axisPointer: {
+                    type: 'shadow'
                 }
-            });
-            chart.facet('rect', {
-                fields: [null, 'clarity'],
-                eachView: function eachView(view) {
-                    view.point().position('carat*price').color('clarity').shape('circle').opacity(0.3).size(3);
+            },
+            grid: {
+                left: '10%',
+                right: '10%',
+                bottom: '15%'
+            },
+            xAxis: {
+                type: 'category',
+                data: data.axisData,
+                boundaryGap: true,
+                nameGap: 30,
+                splitArea: {
+                    show: false
+                },
+                axisLabel: {
+                    formatter: function(param) {
+                        return `${keyByIndex.get(param)}`;
+                    }
+                },
+                splitLine: {
+                    show: false
                 }
-            });
-            chart.render();
-        });
+            },
+            yAxis: {
+                type: 'value',
+                name: '时长/分钟',
+                splitArea: {
+                    show: true
+                },
+                axisLabel: {
+                    formatter: function(param) {
+                        return Math.floor(param / 60);
+                    }
+                },
+            },
+            series: [{
+                    name: 'boxplot',
+                    type: 'boxplot',
+                    data: dataBox.boxData,
+                    tooltip: {
+                        formatter: function(param) {
+                            const format = d => Math.floor(d / 60);
+                            return [
+                                'upper: ' + format(param.data[5]),
+                                'Q3: ' + format(param.data[4]),
+                                'median: ' + format(param.data[3]),
+                                'Q1: ' + format(param.data[2]),
+                                'lower: ' + format(param.data[1])
+                            ].join('<br/>');
+                        }
+                    }
+                },
+                {
+                    name: 'outlier',
+                    type: 'scatter',
+                    data: dataBox.outliers,
+                    tooltip: {
+                        formatter: function(param) {
+                            const format = d => Math.floor(d / 60);
+                            const i = param.data[0], value = param.data[1];
+                            const key = keyByIndex.get(i);
+                            const m = idByStayTime[key];
+                            return `id:${m.get(value)}, value:${format(param.data[1])}`
+                        }
+                    }
+                }
+            ]
+        };
+
+        let outerPid = [];
+        for (let o of dataBox.outliers) {
+            const i = o[0],
+                value = o[1];
+            const key = keyByIndex.get(i);
+            const m = idByStayTime[key];
+            // console.log(key, value, m.size())
+            outerPid = [...outerPid, ...m.get(value)];
+        }
+
+        //获得所有有问题的人的sid
+        console.log(outerPid);
+        myChart.setOption(option);
     })
 }();
