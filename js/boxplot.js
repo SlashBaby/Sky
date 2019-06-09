@@ -21,13 +21,13 @@ const boxplot = function() {
             d.gridIdList.forEach(id => {
                 let sid;
                 //如果该格子有传感器,根据传感器id获得type id
-                if ((sid = sidByGid[id]) ) {
+                if ((sid = sidByGid[id])) {
                     typeNameBySid.set(+sid, d.name);
                 }
             })
         });
 
-        const data = [];
+        let data = {};
 
         //根据停留时间确定id
         const idByStayTime = {}; //d3.map();
@@ -41,7 +41,7 @@ const boxplot = function() {
                 const l = log[i];
                 const sid = l[1];
                 const time = l[0];
-                let type = typeNameBySid.get(sid);
+                let type = typeNameBySid.get(sid) ? typeNameBySid.get(sid):'其他';
 
                 if (!list[type]) {
                     list[type] = {
@@ -69,7 +69,7 @@ const boxplot = function() {
                 const pl = log[i - 1];
                 const ptime = pl[0];
                 const psid = pl[1];
-                const ptype = typeNameBySid.get(psid);
+                const ptype = typeNameBySid.get(psid) ? typeNameBySid.get(psid):'其他';
 
 
                 if (type != ptype) { //如果上一个时间的room和当前room的类型不同，离开了房间
@@ -104,16 +104,30 @@ const boxplot = function() {
 
         }
 
-        console.log('data', data);
+
+
+        // let newData = {};
+        // for(let key in data){
+        //     console.log(key);
+        //     if(key != null){
+        //         newData[key] = data[key];
+        //     }
+        // }
+        // data = newData;
+
+        // console.log(newData)
+        // console.log('data', data);
 
         const dataStay = [],
             dataMove = [];
         const keyByIndex = d3.map();
         let index = -1;
         for (let k in data) {
-            keyByIndex.set(++index, k);
-            dataStay.push(data[k].stay);
-            dataMove.push(data[k].move);
+            if (k != '其他') {
+                keyByIndex.set(++index, k);
+                dataStay.push(data[k].stay);
+                dataMove.push(data[k].move);
+            }
         }
 
         console.log(dataStay)
