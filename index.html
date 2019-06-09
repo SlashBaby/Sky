@@ -32,7 +32,7 @@
     <script src='js/Point/js/js-colormaps.js'></script>
     <script src='js/Point/js/jquery.timer.js'></script>
     <script src="js/Point/js/papaparse.min.js"></script>
-<!--     <script src="https://cdn.jsdelivr.net/npm/vega@5.4.0"></script>
+    <!--     <script src="https://cdn.jsdelivr.net/npm/vega@5.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@3.3.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@4.2.0"></script> -->
     <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.4.10/dist/g2.min.js"></script>
@@ -54,7 +54,7 @@
       #left-vis{
         background:red;
         height: 670px;
-        overflow:hidden;
+        overflow:scroll;
       }
 
       #main-wrapper{
@@ -126,6 +126,11 @@
                     <button type="button" id="btn-boxplot" class="btn btn-info">box plot</button>
                     <button type="button" id="btn-update" class="btn btn-primary">update</button>
                     <button type="button" id="btn-save-data" class="btn btn-primary">save data</button>
+                    <select id="day_select">
+                        <option value="1">Day1</option>
+                        <option value="2">Day2</option>
+                        <option value="3">Day3</option>
+                    </select>
                 </div>
                 <div id="main-vis" class='row'></div>
             </div>
@@ -137,7 +142,7 @@
     </div>
     <script>
     //读取树的数据
-    d3.json('data/grids/grids_2019_6_8 下午9_44_05.json').then(function(grids_data) {
+    d3.json('data/grids/grids_2019_6_9 下午1_07_32.json').then(function(grids_data) {
         console.log('[load data] grids', grids_data);
 
         const { grids, types } = grids_data;

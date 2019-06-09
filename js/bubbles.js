@@ -2,6 +2,11 @@ const bubbles = function() {
     dispatch.on('initbubbles', (logsBySid, move_data, types) => {
         console.log('[event] initbubbles', move_data);
         currentVis = 'bubbles';
+        //监听更新事件
+        dispatch.on('updatecurrent.bubbles', () => {
+            if (currentVis === 'bubbles')
+                dispatch.call('initbubbles', this, logsBySid, move_data, types);
+        })
         //清空画布
         clearMainVis();
         if(d3.select('#main-footer').empty()){
@@ -44,6 +49,8 @@ const bubbles = function() {
         //根据传感器的id获得对应的type
         typeNameBySid = d3.map();
 
+        spaces = spaces.filter(d => d.name != '出口');
+
         //计算每个空间的数据：每个房间每个时间点改变的人数
         spaces.forEach(d => {
             const dataByTime = {};
@@ -62,8 +69,6 @@ const bubbles = function() {
                             change = +item[1];
 
                         const exit = [11505, 11515, 11517, 10019];
-
-
 
                         if (exit.indexOf(+sid) == -1) {
                             //如果不是出口
@@ -115,6 +120,9 @@ const bubbles = function() {
             for (let item of d.m) {
                 const source = typeNameBySid.get(+item[0]);
                 const target = typeNameBySid.get(+item[1]);
+                //没有找到这个边
+                if(!source  || !target)
+                    continue;
                 if (source === target)
                     continue;
                 list.push([source, target, item[2]]);
@@ -210,7 +218,7 @@ const bubbles = function() {
                     const bisect = d3.bisector(d => d[0]);
 
                     //some scales
-                    const durationScale = d3.scaleLinear([25240, 64858], [100000, 0]),
+                    const durationScale = d3.scaleLinear([25240, 64858], [1000000, 0]),
                         colorScale = d3.scaleOrdinal()
                         .domain(d.nodes.map(d => d.name))
                         .range(d3.schemeCategory10),
@@ -222,14 +230,14 @@ const bubbles = function() {
                     computeLayout(nodes, links);
 
                     //links
-                    // const link = svg.append("g")
-                    //     .attr("stroke-opacity", 0.6)
-                    //     .selectAll("path")
-                    //     .data(links)
-                    //     .join("path")
-                    //     .attr('class', 'link')
-                    //     .attr("stroke-width", 2)
-                    //     .call(linksUpdate)
+                    const link = svg.append("g")
+                        .attr("stroke-opacity", 0.6)
+                        .selectAll("path")
+                        .data(links)
+                        .join("path")
+                        .attr('class', 'link')
+                        .attr("stroke-width", 2)
+                        .call(linksUpdate)
 
                     //dots
                     const dot = svg.append('g')
@@ -428,6 +436,7 @@ const bubbles = function() {
 
                     function computeLayout(nodes, links) {
 
+                        if(!links)alter();
                         //compute radius
                         nodes.forEach(d => {
                             d.r = radiusScale(radius(d));
@@ -437,10 +446,18 @@ const bubbles = function() {
                         });
 
                         //compute position
+                        // console.log(links);
                         const simulation = d3.forceSimulation(nodes)
                             .force("center", d3.forceCenter(width / 2, height / 2))
+                            .force("link", d3.forceLink(links)
+                                .id(d => d.name))
                             .force("collide", forceCollide())
-                            // .force("link", d3.forceLink(links).id(d => d.name));
+                            
+                                // .strength(link => {
+                                //     console.log(link);
+                                //     const count = d => 
+                                //     return 1 / Math.min(count(link.source), count(link.target));
+                                // }));
 
 
                         //计算新的布局
@@ -457,8 +474,8 @@ const bubbles = function() {
                         dot.data(nodes, key)
                             .call(position);
 
-                        // link.data(links, d => d.index)
-                            //.call(linksUpdate)
+                        link.data(links, d => d.index)
+                            .call(linksUpdate)
 
                         dot.select('title').text(d => `${d.name}:${Math.floor(d.population)}`);
 

@@ -2,7 +2,13 @@ const boxplot = function() {
     dispatch.on('initboxplot', (move_and_stay, types) => {
         console.log('initboxplot', move_and_stay);
         clearMainVis();
-        currentVis = 'boxplot'
+        currentVis = 'boxplot';
+
+        //监听更新事件
+        dispatch.on('updatecurrent.boxplot', () => {
+            if (currentVis === 'boxplot')
+                dispatch.call('initboxplot', this, move_and_stay, types);
+        })
 
         //获得需要聚类的空间
         let spaces = types.selectedNodeList();
@@ -15,7 +21,7 @@ const boxplot = function() {
             d.gridIdList.forEach(id => {
                 let sid;
                 //如果该格子有传感器,根据传感器id获得type id
-                if ((sid = sidByGid[id])) {
+                if ((sid = sidByGid[id]) ) {
                     typeNameBySid.set(+sid, d.name);
                 }
             })
@@ -35,7 +41,7 @@ const boxplot = function() {
                 const l = log[i];
                 const sid = l[1];
                 const time = l[0];
-                const type = typeNameBySid.get(sid);
+                let type = typeNameBySid.get(sid);
 
                 if (!list[type]) {
                     list[type] = {
@@ -193,7 +199,8 @@ const boxplot = function() {
                     tooltip: {
                         formatter: function(param) {
                             const format = d => Math.floor(d / 60);
-                            const i = param.data[0], value = param.data[1];
+                            const i = param.data[0],
+                                value = param.data[1];
                             const key = keyByIndex.get(i);
                             const m = idByStayTime[key];
                             return `id:${m.get(value)}, value:${format(param.data[1])}`
@@ -214,9 +221,9 @@ const boxplot = function() {
 
         allpeople.forEach(d => d.isSelected = false);
         //更新people
-        for(let id of outerPid){
-        	const p = peopleById.get(id);
-        	p.isSelected = true;
+        for (let id of outerPid) {
+            const p = peopleById.get(id);
+            p.isSelected = true;
         }
 
         dispatch.call('inittreemap', this, allpeople);

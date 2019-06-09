@@ -138,14 +138,7 @@ const grid = function() {
                 stop_button();
             })
 
-
-        $('#stop_button').after(`<select id="day_select">
-                <option value="1">Day1</option>
-                <option value="2">Day2</option>
-                <option value="3">Day3</option>
-            </select>`)
-
-        $('#day_select').after(` &nbsp;&nbsp;<input id="show_heatmap" type="button" value="Heatmap: off" onclick="show_heatmap()" />`)
+        $('#stop_button').after(` &nbsp;&nbsp;<input id="show_heatmap" type="button" value="Heatmap: off" onclick="show_heatmap()" />`)
         $('#show_heatmap').after(`&nbsp;&nbsp;<input id="person_button" type="button" value="Person: on" onclick="show_person();" />
             id:<input id="id_num" type="number" value="19996" style="width: 70px">
             <input type="button" value="draw" onclick="change_id()" />`)
