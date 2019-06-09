@@ -7,9 +7,11 @@ const treemap = function() {
         // currentLeftVis = 'treemap'
         currentLeftVis = 'treemap';
 
-        d3.select('#left-footer')
-            .append('button')
-            .attr('class', 'btn btn-primary')
+        const btngroup = d3.select('#left-footer')
+            .append('div')
+            .attr('class', 'btn-group')
+        btngroup.append('button')
+            .attr('class', 'btn btn-color')
             .text('添加')
             .on('click', () => {
                 const selected = data.filter(d => d.isSelected);
@@ -23,14 +25,16 @@ const treemap = function() {
                     return;
                 }
                 $('#btn-people-name').val("");
-                selected.forEach(d => { d.type = name;
-                    d.isSelected = false })
+                selected.forEach(d => {
+                    d.type = name;
+                    d.isSelected = false
+                })
                 dispatch.call('inittreemap', this, data);
             })
 
-        d3.select('#left-footer')
+        btngroup
             .append('button')
-            .attr('class', 'btn btn-primary')
+            .attr('class', 'btn btn-color')
             .text('删除')
             .on('click', () => {
                 const selected = data.filter(d => d.isSelected);
@@ -41,9 +45,9 @@ const treemap = function() {
                 dispatch.call('inittreemap', this, data);
             })
 
-        d3.select('#left-footer')
+        btngroup
             .append('button')
-            .attr('class', 'btn btn-primary')
+            .attr('class', 'btn btn-color')
             .text('清空')
             .on('click', () => {
                 data.forEach(d => d.isSelected = false);
@@ -60,11 +64,10 @@ const treemap = function() {
             .append('svg')
             .attr('width', container.width)
             .attr('height', container.height)
-            .style('background', 'black')
+            .attr('class', 'bg-color')
+            // .style('background', 'black')
             .append('g')
             .attr('transform', `translate(${margin.left},${margin.right})`);
-
-
 
 
         //计算颜色比例尺
@@ -82,7 +85,7 @@ const treemap = function() {
         const range = [];
         const step = 1 / countByType.size();
         for (let i = 0; i < 1; i += step) {
-            range.push(d3.interpolateCool(i))
+            range.push(d3.interpolateBlues(i))
         }
         const domain = countByType.keys()
         domain.sort((a, b) => countByType.get(a.type) - countByType.get(b.type));
@@ -101,7 +104,7 @@ const treemap = function() {
             .data(data)
             .join('rect')
             .attr('stroke', 'black')
-            .attr('fill', d => d.isSelected ? 'red' : color(d.type))
+            .attr('fill', d => d.isSelected ? 'blue' : color(d.type))
             .attr('x', (d, i) => w * (i % 50))
             .attr('y', (d, i) => {
                 return h * Math.floor(i / 50);

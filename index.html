@@ -8,6 +8,7 @@
     <!-- csss -->
     <link rel="stylesheet" href="assets/bootstrap.min.css">
     <link rel="stylesheet" href="css/bubbles.css">
+    <link rel="stylesheet" href="css/tree.css">
     </style>
     <!-- js -->
     <script src="assets/jquery3.js"></script>
@@ -44,93 +45,123 @@
         padding:0px;
       }
       #left-wrapper{
-        background:black;
+        background:#0b2631;
         height: 770px;
       }
       #left-nav{
-        background:#6D87D6;
+        background:#0b2631;
         height:50px;
       }
       #left-vis{
-        background:red;
+        background:#0b2631;
         height: 670px;
         overflow:scroll;
       }
 
       #main-wrapper{
-        background:green;   
+        background:#0b2631;   
       }
       #main-nav{
-        background:yellow;
+        background:#0b2631;
         height:50px;
       }
       #main-vis{
-        background:white;
+        background:#0b2631;
         height:670px;
       }
       #main-footer{
-        background:yellow;
+        background:#0b2631;
         height:50px;
       }      
-      #right-wrapper{
-        background:black;   
-      }
       #left-main-footer{
-        background: red;
+        background: #0b2631;
         width: 655px;
       }
       #right-main-footer{
-        background: green;
+        background: #0b2631;
         width: 655px;
       }
       #canvas {
-        margin-top:3px;
-        border: 3px solid rgb(170, 170, 170);width:600px;height:300px
+        margin-top:50px;
+        -border: 3px solid rgb(170, 170, 170);width:570px;height:265px;
+        background: white
       }
 
       #canvas2 {
-        margin-top:3px;
-        border: 3px solid rgb(170, 170, 170);width:600px;height:300px
+        margin-top:25px;
+        -border: 3px solid rgb(170, 170, 170);width:570px;height:265px;
+        background: white
       }
+      .bg-color{
+        background: #0b2631;
+      }
+
+      .btn-color{
+        background: #5dd1fa;
+      }
+
+      label{
+        -color: #5dd1fa;
+        color:#c6dbef;
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+      .select-color{
+        background: #c6dbef;
+      }
+
+      /*.btn-color{
+        background: #5dd1fa;
+        color:#0b2631;
+      }*/
       
     </style>
 </head>
 
 <body>
-    <div id="header" class="container-fluid bg-dark text-white" style="height: 60px">
+    <div id="header" class="container-fluid bg-color text-white" style="height: 60px">
         <div id="">
             <h3 style="margin: 0;">ChinaVis 2019</h3>
-            <em>A monitor system to analyse the real-time situation.</em>
+            <em>一个分析会议的监控系统</em>
         </div>
     </div>
-    <div id="container" class="container-fluid">
+    <div id="container" class="container-fluid bg-color">
         <div class="row">
-            <div id="left-wrapper" class="col-2">
+            <div id="left-wrapper" class="col-2 bg-color">
                 <div id="left-content">
-                    <div id="left-nav">
-                        <button type="button" id="btn-tree" class="btn btn-primary">空间分类</button>
-                        <button type="button" id="btn-map" class="btn btn-primary">人员分类</button>
+                    <div id="left-nav" class="bg-color">
+                        <button type="button" id="btn-tree" class="btn btn-color">空间分类</button>
+                        <button type="button" id="btn-map" class="btn btn-color">人员分类</button>
                     </div>
                     <div id="left-vis"></div>
-                    <div id="left-footer">
+                    <div id="left-footer" class='bg-dark'>
                     </div>
                 </div>
             </div>
             <div id="main-wrapper" class="col-10">
-                <div id="main-nav" class='row'>
-                    <button type="button" id="btn-grids" class="btn btn-info">grids</button>
-                    <button type="button" id="btn-bubbles" class="btn btn-info">bubbles</button>
-                    <button type="button" id="btn-areas" class="btn btn-info">areas</button>
-                    <!-- <button type="button" id="btn-parallelSet" class="btn btn-info">parallel set</button> -->
-                    <button type="button" id="btn-parallelCoord" class="btn btn-info">parallel coord</button>
-                    <button type="button" id="btn-boxplot" class="btn btn-info">box plot</button>
-                    <button type="button" id="btn-update" class="btn btn-primary">update</button>
-                    <button type="button" id="btn-save-data" class="btn btn-primary">save data</button>
-                    <select id="day_select">
-                        <option value="1">Day1</option>
-                        <option value="2">Day2</option>
-                        <option value="3">Day3</option>
-                    </select>
+                <div id="main-nav" class='bg-color row'>
+                    <div class="col-9">
+                        <button type="button" id="btn-grids" class="btn btn-color">地图</button>
+                        <button type="button" id="btn-bubbles" class="btn btn-color">气泡图</button>
+                        <button type="button" id="btn-areas" class="btn btn-color">面积图</button>
+                        <!-- <button type="button" id="btn-parallelSet" class="btn btn-color">parallel set</button> -->
+                        <button type="button" id="btn-parallelCoord" class="btn btn-color">平行坐标系</button>
+                        <button type="button" id="btn-boxplot" class="btn btn-color">箱线图</button>
+                    </div>
+                    <div class="btn-toolbar">
+                        <div class="">
+                            <button type="button" id="btn-update" class="btn btn-color">更新图表</button>
+                            <button type="button" id="btn-save-data" class="btn btn-color">保存数据</button>
+                        </div>
+                        &nbsp;
+                        <div class="input-group">
+                            <select id="day_select" class="btn-color custom-select">
+                                <option value="1">第一天</option>
+                                <option value="2">第二天</option>
+                                <option value="3">第三天</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div id="main-vis" class='row'></div>
             </div>
@@ -141,6 +172,17 @@
         </div>
     </div>
     <script>
+    //监听添加tag
+    dispatch.on('addtag', selectedId => {
+        console.log(selectedId);
+        allpeople.forEach(d => {
+            if (selectedId.indexOf(d.id) != -1) {
+                d.isSelected = true;
+            }
+        });
+        dispatch.call('inittreemap', this, allpeople);
+    })
+
     //读取树的数据
     d3.json('data/grids/grids_2019_6_9 下午1_07_32.json').then(function(grids_data) {
         console.log('[load data] grids', grids_data);

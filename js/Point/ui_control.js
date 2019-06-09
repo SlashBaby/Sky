@@ -1,10 +1,10 @@
 function stop_button() {
     if (timer.isActive) {
         timer.pause();
-        $('#stop_button').val("Start");
+        $('#stop_button').val("开始");
     } else {
         timer.play();
-        $('#stop_button').val("Stop");
+        $('#stop_button').val("结束");
     }
 
 }
@@ -125,12 +125,12 @@ function show_heatmap()
     if(show_heatmap_bool)
     {
         show_heatmap_bool = false;
-        $('#show_heatmap').val("Heatmap: off");
+        $('#show_heatmap').val("热力图(关闭)");
         draw();
     }else
     {
         show_heatmap_bool = true;
-        $('#show_heatmap').val("Heatmap: on");
+        $('#show_heatmap').val("热力图(开启)");
         draw();
     }
 }
@@ -155,12 +155,12 @@ function show_person()
     if(person_bool)
     {
         person_bool = false;
-        $('#person_button').val("Person: off");
+        $('#person_button').val("个人轨迹(关闭)");
         draw();
     }else
     {
         person_bool = true;
-        $('#person_button').val("Person: on");
+        $('#person_button').val("个人轨迹(开启)");
         draw();
     }
 }
@@ -338,6 +338,7 @@ function get_list_boxs(box_list)
         }
     }
     add_tag_to_list(p_list,parseInt($('#tag_select').children('option:selected').val()));
+    dispatch.call('addtag', this, p_list);
     return p_list;
 }
 

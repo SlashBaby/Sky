@@ -13,7 +13,8 @@ const dispatch = d3.dispatch(
     'initparacoord',
     'initboxplot',
     'inittreemap',
-    'updatecurrent'
+    'updatecurrent',
+    'addtag'
 );
 
 const leftDimensions = {
@@ -82,7 +83,7 @@ let currentVis;
 let currentLeftVis;
 
 let roomForArea = [];
-
+let colorType;
 //平行坐标系的时间
 let maxTime = 64858,
     minTime = 25240;

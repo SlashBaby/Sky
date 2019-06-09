@@ -1,5 +1,5 @@
     .dot {
-        stroke: #000;
+        stroke: white;
     }
 
     .label {
@@ -8,11 +8,11 @@
 
     .year.label {
         font: 500 196px "Helvetica Neue";
-        fill: #ddd;
+        fill: #c6dbef;
     }
 
     .year.label.active {
-        fill: #aaa;
+        fill: #c6dbef;
     }
 
     .overlay {
@@ -22,9 +22,9 @@
     }
 
     .scroll-bar {
-        fill: #ddd;
+        fill: #c6dbef;
     }
 
     .scroll-dot{
-        fill:black;
+        fill:#5dd1fa;
     }

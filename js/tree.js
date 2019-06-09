@@ -15,8 +15,9 @@ const tree = function() {
         const svg = d3.select('#left-vis')
             .append('svg')
             .attr('id', 'svg-tree')
+            .attr('class', 'bg-color')
             .style("font", "10px sans-serif")
-            .style('background', 'yellow')
+            // .style('background', 'yellow')
             .style("user-select", "none")
             .datum(tree);
 
@@ -32,9 +33,14 @@ const tree = function() {
             .attr('cursor', 'pointer');
 
         //some button listener
-        d3.select('#left-footer')
-            .append('button')
-            .attr('class', 'btn btn-primary')
+        const btngroup = d3.select('#left-footer')
+            .attr('class', 'btn-toolbar')
+            .append('div')
+            .attr('class', "btn-group")
+
+        btngroup.append('button')
+            .attr('class', 'btn btn-color')
+            .attr('type', 'button')
             .on('click', () => {
                 console.log('[event] merge node');
                 const list = tree.selectedNodeList();
@@ -47,19 +53,26 @@ const tree = function() {
                 $('#btn-merge-name').val("");
                 tree.mergeNode(nodeName, list);
             })
-            .text('merge')
+            .text('合并')
 
-        d3.select('#left-footer')
-            .append('button')
-            .attr('class', 'btn btn-primary')
+        // d3.select('#left-footer')
+        btngroup.append('button')
+            .attr('class', 'btn btn-color')
+            .attr('type', 'button')
+            .attr('id', 'btn-delete-tree')
             .on('click', () => {
                 console.log('[event] delete node');
                 const list = tree.selectedNodeList();
                 tree.deleteNode(list);
             })
-            .text('delete')
+            .text('删除')
+
+        $('#btn-delete-tree')
+            .after(`&nbsp;`);
 
         d3.select('#left-footer')
+            .append('div')
+            .attr('class', "input-group")
             .append('input')
             .attr('type', 'text')
             .attr('id', 'btn-merge-name')
@@ -327,9 +340,9 @@ const tree = function() {
 
         //返回分会场的人员情况
         tree.area = () => {
-            const list = ['主会场', '分会场A', '分会场B','分会场C','分会场D'];
+            const list = ['主会场', '分会场A', '分会场B', '分会场C', '分会场D'];
             tree.eachBefore(d => {
-                if(list.indexOf(d.name) != -1 ){
+                if (list.indexOf(d.name) != -1) {
                     roomForArea.push(d);
                 }
             })
@@ -342,14 +355,14 @@ const tree = function() {
             let width = 500,
                 height = 600,
                 dx = 20,
-                dy = 10;
+                dy = 30;
 
             function my(selection) {
 
                 selection.each(function(d, i) {
                     console.log('[function] treeChart.init');
                     //d.log();
-                    if(roomForArea.length === 0){
+                    if (roomForArea.length === 0) {
                         tree.area();
                         console.log(roomForArea);
                     }
@@ -451,7 +464,7 @@ const tree = function() {
 
 
                         nodeUpdate.selectAll('circle')
-                            .attr('fill', d => d._children ? '#555' : '#999')
+                            .attr('fill', '#ddd')
 
 
                         //Transition exiting nodes to the parent's new position
@@ -480,6 +493,7 @@ const tree = function() {
 
                         //Transition links to their new position.
                         link.merge(linkEnter).transition(transition)
+                            .attr('stroke', '#BCBABA')
                             .attr('d', diagonal)
 
                         //Transition exiting nodes to the parent's new position

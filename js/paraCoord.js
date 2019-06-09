@@ -115,6 +115,7 @@ const paraCoord = function() {
             d3.select('#main-wrapper')
                 .append('div')
                 .attr('id', 'main-footer')
+
         }
 
 
@@ -153,9 +154,14 @@ const paraCoord = function() {
             }
         }
 
+        const divbox = d3.select('#main-footer')
+            .append('div')
+            .attr('class', 'btn-toolbar')
+            .append('div')
+            .attr('class', 'input-group')
         //添加筛选框，一个起始时间一个结束时间
-        d3.select('#main-footer')
-            .append('label')
+        // d3.select('#main-footer')
+        divbox.append('label')
             .text('起始时间')
 
         const formatTime = time => {
@@ -184,9 +190,10 @@ const paraCoord = function() {
         timeByValue.set(t, maxTime);
         timelist.push(t);
 
-        const select1 = d3.select('#main-footer')
-            .append('select')
+        // const d3.select('#main-footer')
+        select1 = divbox.append('select')
             .attr('id', 'select-startTime')
+            .attr('class', 'select-color custom-select')
 
         select1.selectAll('option')
             .data(timelist)
@@ -194,12 +201,13 @@ const paraCoord = function() {
             .text(d => d);
 
 
-        d3.select('#main-footer')
-            .append('label')
+        // d3.select('#main-footer')
+        divbox.append('label')
             .text('结束时间')
 
-        const select2 = d3.select('#main-footer')
+        const select2 = divbox
             .append('select')
+            .attr('class', 'select-color custom-select')
             .attr('id', 'select-endTime');
 
         select2.selectAll('option')
@@ -215,11 +223,12 @@ const paraCoord = function() {
         $("#select-endTime").val(formatTime(endTime));
 
         //添加选择
-        d3.select('#main-footer')
-            .append('label')
+        // d3.select('#main-footer')
+           divbox .append('label')
             .text('种类')
-        const select = d3.select('#main-footer')
-            .append('select')
+        // const select = d3.select('#main-footer')
+          select =   divbox.append('select')
+            .attr('class', 'select-color custom-select')
             .attr('id', 'select-paraCoord')
 
         select.append('option')
@@ -228,10 +237,12 @@ const paraCoord = function() {
         select.append('option')
             .text('进入次数')
 
-        d3.select('#main-footer')
+        // d3.select('#main-footer')
+           divbox.append('div')
+            .style('margin-left', `${20}px`)
             .append('button')
             .attr('class', 'btn btn-primary')
-            .text('显示选择人')
+            .text('显示选择的人')
             .on('click', () => {
                 console.log('选择', console.log(selectedlist));
                 selectedlist.forEach(d => {
@@ -298,7 +309,7 @@ const paraCoord = function() {
 
         function getOptionByType(data, max) {
             const option = {
-                backgroundColor: '#333',
+                backgroundColor: '#0b2631',
                 parallelAxis: parallelAxis,
                 visualMap: {
                     show: true,

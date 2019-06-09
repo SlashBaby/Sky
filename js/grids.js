@@ -19,13 +19,16 @@ const grid = function() {
             .append('div')
             .attr('id', 'left-main-footer')
             .attr('class', 'col-6')
+            .append('div')
+            .attr('class', 'btn-toolbar')
 
         leftfooter.append('button')
-            .attr('class', 'btn btn-primary dom-grid')
+            .attr('class', 'btn btn-color')
             .attr('id', 'btn-grid-addnode')
             .text('添加种类')
             .on('click', addType);
-
+        $('#btn-grid-addnode')
+            .after(`&nbsp;`);
         leftfooter.append('input')
             .attr('class', 'dom-grid')
             .attr('type', 'text')
@@ -36,12 +39,15 @@ const grid = function() {
             .append('div')
             .attr('id', 'right-main-footer')
             .attr('class', 'col-6')
+            .append('div')
+            .attr('class', 'btn-toolbar')
+            .append('div')
+            .attr('class', 'btn-group')
 
         rightfooter.append('button')
-            .attr('class', 'btn btn-primary')
-            .text('run')
+            .attr('class', 'btn btn-color')
+            .text('初始化')
             .on('click', () => {
-                console.log('画图');
                 draw_canvas();
             })
 
@@ -66,9 +72,9 @@ const grid = function() {
         const leftdiv = d3.select('#main-vis')
             .append('div')
             .attr('class', 'col-6')
-            
+
         const svg = leftdiv.append('svg')
-            .style('background', 'grey')
+            .style('background', '#0b2631')
             .attr('width', container.width / 2)
             .attr('height', container.height)
 
@@ -77,7 +83,7 @@ const grid = function() {
             .data([floor1, floor2])
             .join('g')
             .attr('class', 'gGrid')
-            .attr('transform', (d, i) => `translate(${45},${ 50 + content.height / 2 * i})`)
+            .attr('transform', (d, i) => `translate(${0},${ 50 + content.height / 2 * i})`)
 
         g.append('g')
             .attr('class', 'grid-xAixs');
@@ -103,24 +109,24 @@ const grid = function() {
             .attr('id', 'right-div')
 
         const canvasDiv = rightdiv.append('div')
-                            .attr('id', 'can-div')
+            .attr('id', 'can-div')
 
 
         canvasDiv
             .append('canvas')
             .attr('id', 'canvas')
-            .attr('width',`${1800}px`)
-            .attr('height', `${960}px`)//;height:300px
+            .attr('width', `${1800}px`)
+            .attr('height', `${960}px`) //;height:300px
 
 
         canvasDiv
             .append('canvas')
             .attr('id', 'canvas2')
-            .attr('width',`${1800}px`)
+            .attr('width', `${1800}px`)
             .attr('height', `${960}px`)
 
         $('#can-div').after(`<div id='time-div'>
-            <input id="time_range" type="range" class="custom-range" min="25000" max="73000" value="0" style="width: 600px;" oninput="change_time()" />
+            <input id="time_range" type="range" class="custom-range" min="25000" max="73000" value="0" style="width: 570px;" oninput="change_time()" />
         </div>`)
 
         $('#time-div').after(`<div>
@@ -130,18 +136,20 @@ const grid = function() {
         </div>`)
 
         rightfooter.append('input')
-            .attr('class', 'btn btn-primary')
+            .attr('class', 'btn btn-color')
             .attr('id', 'stop_button')
             .attr('type', 'button')
-            .attr('value', 'stop')
+            .attr('value', '停止')
             .on('click', () => {
                 stop_button();
             })
 
-        $('#stop_button').after(` &nbsp;&nbsp;<input id="show_heatmap" type="button" value="Heatmap: off" onclick="show_heatmap()" />`)
-        $('#show_heatmap').after(`&nbsp;&nbsp;<input id="person_button" type="button" value="Person: on" onclick="show_person();" />
-            id:<input id="id_num" type="number" value="19996" style="width: 70px">
-            <input type="button" value="draw" onclick="change_id()" />`)
+        $('#stop_button').after(`<input id="show_heatmap" type="button" class="btn btn-color" value="热力图(关闭)" onclick="show_heatmap()" />`)
+        $('#show_heatmap').after(`<input id="person_button" type="button" class="btn btn-color" value="个人轨迹(开启)" onclick="show_person();" />
+            &nbsp; 
+            <input type="button" class="btn-color btn" value="人员编号"/>
+            <input id="id_num" type="number" value="19996" class="" style="width:70px">
+            <input type="button" value="画轨迹" class="btn btn-color" onclick="change_id()" />`)
         //一些定义
 
         dispatch.on('update.grid', tree_data => {
@@ -218,9 +226,9 @@ const grid = function() {
                     const range = [];
                     const step = 1 / alltype.length;
                     for (let i = 0; i < 1; i += step) {
-                        range.push(d3.interpolateSpectral(i))
+                        range.push(d3.interpolateRdYlBu(i))
                     }
-                    const color = d3.scaleOrdinal()
+                     colorType = d3.scaleOrdinal()
                         .domain(alltype)
                         .range(range);
 
@@ -259,7 +267,7 @@ const grid = function() {
                         const rectUpdate = rect.merge(rectEnter)
                             .attr('stroke', 'black')
                             .attr('opacity', d => d.isSelected ? 0.4 : 1)
-                            .attr('fill', d => ((d.type === '第一层') || (d.type === '第二层')) ? 'white' : color(d.type));
+                            .attr('fill', d => ((d.type === '第一层') || (d.type === '第二层')) ? 'white' : colorType(d.type));
 
                         //circle
                         const circleEnter = circle.enter().append('circle')

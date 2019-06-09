@@ -41,7 +41,7 @@ const boxplot = function() {
                 const l = log[i];
                 const sid = l[1];
                 const time = l[0];
-                let type = typeNameBySid.get(sid) ? typeNameBySid.get(sid):'其他';
+                let type = typeNameBySid.get(sid) ? typeNameBySid.get(sid) : '其他';
 
                 if (!list[type]) {
                     list[type] = {
@@ -69,7 +69,7 @@ const boxplot = function() {
                 const pl = log[i - 1];
                 const ptime = pl[0];
                 const psid = pl[1];
-                const ptype = typeNameBySid.get(psid) ? typeNameBySid.get(psid):'其他';
+                const ptype = typeNameBySid.get(psid) ? typeNameBySid.get(psid) : '其他';
 
 
                 if (type != ptype) { //如果上一个时间的room和当前room的类型不同，离开了房间
@@ -140,11 +140,14 @@ const boxplot = function() {
                 .attr('id', 'main-footer')
         }
 
-        var myChart = echarts.init(document.getElementById('main-vis'));
+        var myChart = echarts.init(document.getElementById('main-vis'), 'light');
         var dataBox = echarts.dataTool.prepareBoxplotData(dataStay);
 
 
         const option = {
+            textStyle: {
+                color: '#ddd'
+            },
             title: [{
                 text: '停留时长',
                 left: 'center',
@@ -204,7 +207,7 @@ const boxplot = function() {
                                 'lower: ' + format(param.data[1])
                             ].join('<br/>');
                         }
-                    }
+                    },
                 },
                 {
                     name: 'outlier',

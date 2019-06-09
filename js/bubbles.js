@@ -9,36 +9,40 @@ const bubbles = function() {
         })
         //清空画布
         clearMainVis();
-        if(d3.select('#main-footer').empty()){
+        if (d3.select('#main-footer').empty()) {
             d3.select('#main-wrapper')
-            .append('div')
-            .attr('id', 'main-footer')
+                .append('div')
+                .attr('id', 'main-footer')
         }
 
         //添加按钮
-        d3.select('#main-footer')
-            .append('button')
-            .attr('class', 'btn btn-primary dom-grid')
+        const btngroup = d3.select('#main-footer')
+            .append('div')
+            .append('div')
+            .attr('class', 'btn-group')
+
+        btngroup.append('button')
+            .attr('class', 'btn btn-color dom-grid')
             .attr('id', 'btn-bubbles-run')
-            .text('run')
+            .text('开始')
 
-        d3.select('#main-footer')
+        btngroup
             .append('button')
-            .attr('class', 'btn btn-primary dom-grid')
+            .attr('class', 'btn btn-color dom-grid')
             .attr('id', 'btn-bubbles-stop')
-            .text('stop')
+            .text('停留')
 
-        d3.select('#main-footer')
+        btngroup
             .append('button')
-            .attr('class', 'btn btn-primary dom-grid')
+            .attr('class', 'btn btn-color dom-grid')
             .attr('id', 'btn-bubbles-add')
-            .text('Mark time')
+            .text('标记时间')
 
-        d3.select('#main-footer')
+        btngroup
             .append('button')
-            .attr('class', 'btn btn-primary dom-grid')
+            .attr('class', 'btn btn-color dom-grid')
             .attr('id', 'btn-bubbles-delete')
-            .text('delete mark')
+            .text('删除标记')
 
 
         //准备数据
@@ -121,7 +125,7 @@ const bubbles = function() {
                 const source = typeNameBySid.get(+item[0]);
                 const target = typeNameBySid.get(+item[1]);
                 //没有找到这个边
-                if(!source  || !target)
+                if (!source || !target)
                     continue;
                 if (source === target)
                     continue;
@@ -210,8 +214,8 @@ const bubbles = function() {
                         const s = (time % 3600) % 60;
                         return `${wrap(h)}:${wrap(m)}:${wrap(s)}`;
 
-                        function wrap(n){
-                            return n < 10 ? `0${n}`:`${n}`;
+                        function wrap(n) {
+                            return n < 10 ? `0${n}` : `${n}`;
                         }
                     }
 
@@ -219,7 +223,7 @@ const bubbles = function() {
 
                     //some scales
                     const durationScale = d3.scaleLinear([25240, 64858], [1000000, 0]),
-                        colorScale = d3.scaleOrdinal()
+                        colorScale = d3.scaleOrdinal(d3.schemeSet3)
                         .domain(d.nodes.map(d => d.name))
                         .range(d3.schemeCategory10),
                         radiusScale = d3.scaleSqrt([0, 3000], [1, 150]),
@@ -246,6 +250,7 @@ const bubbles = function() {
                         .join('circle')
                         .attr('class', 'dot')
                         .attr('fill', d => colorScale(color(d)))
+                        // .attr('opcaity', 0.8)
                         .call(position);
 
                     dot.append('title')
@@ -256,7 +261,7 @@ const bubbles = function() {
                     const label = svg.append('text')
                         .attr("class", "year label")
                         .attr('text-anchor', 'end')
-                        .attr("x", width - 60)
+                        .attr("x", width - 160)
                         .attr("y", height - 24)
                         .text(formatTime(25240));
 
@@ -264,7 +269,7 @@ const bubbles = function() {
                     //scroll bar
                     const scroll = svg.append('g')
                         .attr('class', 'scroll')
-                        .attr('transform', `translate(${500}, ${height + 20})`);
+                        .attr('transform', `translate(${400}, ${height + 20})`);
 
                     scroll.append('rect')
                         .attr('class', 'scroll-bar')
@@ -281,14 +286,15 @@ const bubbles = function() {
                         .data(marklist, d => d.time)
                         .call(update);
 
-                    const rectW = 30, rectH = 20;
+                    const rectW = 30,
+                        rectH = 20;
 
                     //legends
                     const legend = svg.append('g')
                         .attr('class', 'legend')
-                        .attr('transform', `translate(${10}, ${50})`)
+                        .attr('transform', `translate(${1250}, ${50})`)
                         .selectAll('g')
-                        .data(nodes.map(d => ({name:d.name})))
+                        .data(nodes.map(d => ({ name: d.name })))
                         .join('g')
                         .attr('transform', (d, i) => `translate(0, ${rectH * i})`);
 
@@ -302,6 +308,7 @@ const bubbles = function() {
                     legend.append('text')
                         .attr('x', rectW * 1.2)
                         .attr('dy', '1em')
+                        .style('fill', '#c6dbef')
                         .text(d => d.name);
 
 
@@ -436,7 +443,7 @@ const bubbles = function() {
 
                     function computeLayout(nodes, links) {
 
-                        if(!links)alter();
+                        if (!links) alter();
                         //compute radius
                         nodes.forEach(d => {
                             d.r = radiusScale(radius(d));
@@ -448,16 +455,16 @@ const bubbles = function() {
                         //compute position
                         // console.log(links);
                         const simulation = d3.forceSimulation(nodes)
-                            .force("center", d3.forceCenter(width / 2, height / 2))
+                            .force("center", d3.forceCenter(width / 2 - 100, height / 2))
                             .force("link", d3.forceLink(links)
                                 .id(d => d.name))
                             .force("collide", forceCollide())
-                            
-                                // .strength(link => {
-                                //     console.log(link);
-                                //     const count = d => 
-                                //     return 1 / Math.min(count(link.source), count(link.target));
-                                // }));
+
+                        // .strength(link => {
+                        //     console.log(link);
+                        //     const count = d => 
+                        //     return 1 / Math.min(count(link.source), count(link.target));
+                        // }));
 
 
                         //计算新的布局
@@ -568,7 +575,7 @@ const bubbles = function() {
                         //线性插值
                         const i = bisect.left(values, year, 0, values.length - 1),
                             a = values[i];
-                        
+
                         //如果是最后一个就返回0
                         if (i === values.length - 1) {
                             return 0;

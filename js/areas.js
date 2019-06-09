@@ -100,6 +100,7 @@ const areas = function() {
             .append('div')
             .attr('class', 'col-9')
             .attr('id', 'div-area')
+            // .style('background', '#5dd1fa')
 
         var chart = new G2.Chart({
             container: 'div-area',
@@ -138,7 +139,7 @@ const areas = function() {
         chart.facet('rect', {
             fields: [null, 'symbol'],
             eachView: function eachView(view) {
-                view.area().position('date*price').color('symbol', G2.Global.colors_pie_16).opacity(0.3);
+                view.area().position('date*price').color('symbol', G2.Global.colors_pie_16);
             }
         });
         chart.legend(false);
