@@ -4,10 +4,10 @@ const areas = function() {
 
         //清空画布
         clearMainVis();
+        currentVis = 'areas';
 
         //获得需要聚类的空间
-        let spaces = types.selectedNodeList()
-        if (spaces.length === 0) spaces = types.leaves();
+        let spaces = roomForArea;
         // console.log(spaces);
 
         //计算每个空间的数据：每个时间点改变的人数
@@ -96,19 +96,36 @@ const areas = function() {
 
         console.log(data1);
 
+        d3.select('#main-vis')
+            .append('div')
+            .attr('class', 'col-9')
+            .attr('id', 'div-area')
 
         var chart = new G2.Chart({
-            container: 'main-vis',
+            container: 'div-area',
             forceFit: true,
-            height: 700,
+            height: 650,
             padding: [40, 80, 80, 80]
         });
         chart.source(data, {
             date: {
                 sync: true,
-                type: 'time',
-                tickCount: 20
-                //mask: 'm/dd hh:MM'
+                //type: 'time',
+                tickCount: 20,
+                formatter: function formatter(val) {
+                    const formatTime = time => {
+                        const h = Math.floor(time / 3600);
+                        const m = Math.floor((time % 3600) / 60);
+                        const s = (time % 3600) % 60;
+                        return `${wrap(h)}:${wrap(m)}:${wrap(s)}`;
+
+                        function wrap(n) {
+                            return n < 10 ? `0${n}` : `${n}`;
+                        }
+                    }
+                    console.log(val);
+                    return formatTime(val);
+                }
             },
             price: {
                 sync: true,
@@ -128,10 +145,10 @@ const areas = function() {
         chart.render();
 
 
-        //right vis
-        clearRightVis();
 
-        const rightVis = d3.select('#right-vis');
+        const rightVis = d3.select('#main-vis')
+            .append('div')
+            .attr('class', 'col-3');
         rightVis.append('div')
             .attr('id', 'div-bar')
 
@@ -143,7 +160,7 @@ const areas = function() {
         var chart = new G2.Chart({
             container: 'div-bar',
             forceFit: true,
-            height: 400
+            height: 350
         });
         chart.source(data1, {
             value: {
@@ -206,7 +223,7 @@ const areas = function() {
         var chart2 = new G2.Chart({
             container: 'div-pie',
             forceFit: true,
-            height: 350
+            height: 300
         });
 
         chart2.source(data2);

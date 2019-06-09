@@ -81,6 +81,8 @@ let currentVis;
 
 let currentLeftVis;
 
+let roomForArea = [];
+
 //平行坐标系的时间
 let maxTime = 64858,
     minTime = 25240;

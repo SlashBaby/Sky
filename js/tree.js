@@ -325,6 +325,16 @@ const tree = function() {
             return nodeList;
         }
 
+        //返回分会场的人员情况
+        tree.area = () => {
+            const list = ['主会场', '分会场A', '分会场B','分会场C','分会场D'];
+            tree.eachBefore(d => {
+                if(list.indexOf(d.name) != -1 ){
+                    roomForArea.push(d);
+                }
+            })
+        }
+
         svg.call(chart);
 
         //可视化树图
@@ -338,7 +348,11 @@ const tree = function() {
 
                 selection.each(function(d, i) {
                     console.log('[function] treeChart.init');
-                    d.log();
+                    //d.log();
+                    if(roomForArea.length === 0){
+                        tree.area();
+                        console.log(roomForArea);
+                    }
 
                     const svg = d3.select(this);
 
