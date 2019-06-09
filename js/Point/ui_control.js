@@ -3,8 +3,9 @@ function stop_button() {
         timer.pause();
         $('#stop_button').val("开始");
     } else {
+        init();
         timer.play();
-        $('#stop_button').val("结束");
+        $('#stop_button').val("停止");
     }
 
 }

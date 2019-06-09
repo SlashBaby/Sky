@@ -7,6 +7,8 @@ const grid = function() {
         //界面处理
         clearMainVis();
 
+
+
         if (d3.select('#main-footer').empty()) {
             d3.select('#main-wrapper')
                 .append('div')
@@ -44,12 +46,13 @@ const grid = function() {
             .append('div')
             .attr('class', 'btn-group')
 
-        rightfooter.append('button')
-            .attr('class', 'btn btn-color')
-            .text('初始化')
-            .on('click', () => {
-                draw_canvas();
-            })
+        // rightfooter.append('button')
+        //     .attr('class', 'btn btn-color')
+        //     .text('初始化')
+        //     .on('click', () => {
+        //         draw_canvas();
+        //     })
+        // draw_canvas();
 
         //数据处理
         updateType();
@@ -139,7 +142,7 @@ const grid = function() {
             .attr('class', 'btn btn-color')
             .attr('id', 'stop_button')
             .attr('type', 'button')
-            .attr('value', '停止')
+            .attr('value', '开始')
             .on('click', () => {
                 stop_button();
             })
@@ -194,7 +197,7 @@ const grid = function() {
             dispatch.call('addnode', this, nodeName, list.map(d => d.id));
         }
 
-
+        draw_canvas();
 
         function gridChart() {
             let width, height;
@@ -228,7 +231,7 @@ const grid = function() {
                     for (let i = 0; i < 1; i += step) {
                         range.push(d3.interpolateRdYlBu(i))
                     }
-                     colorType = d3.scaleOrdinal()
+                    colorType = d3.scaleOrdinal()
                         .domain(alltype)
                         .range(range);
 

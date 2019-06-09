@@ -109,6 +109,10 @@
       .select-color{
         background: #c6dbef;
       }
+      img{
+        margin-left: 30px;
+        margin-top: 50px;
+      }
 
       /*.btn-color{
         background: #5dd1fa;
@@ -122,7 +126,7 @@
     <div id="header" class="container-fluid bg-color text-white" style="height: 60px">
         <div id="">
             <h3 style="margin: 0;">ChinaVis 2019</h3>
-            <em>一个分析会议的监控系统</em>
+            <em>一个分析会议的监控系统。</em>
         </div>
     </div>
     <div id="container" class="container-fluid bg-color">
@@ -144,7 +148,7 @@
                         <button type="button" id="btn-grids" class="btn btn-color">地图</button>
                         <button type="button" id="btn-bubbles" class="btn btn-color">气泡图</button>
                         <button type="button" id="btn-areas" class="btn btn-color">面积图</button>
-                        <!-- <button type="button" id="btn-parallelSet" class="btn btn-color">parallel set</button> -->
+                        <button type="button" id="btn-scatter" class="btn btn-color" onclick="scatter()">散点图</button>
                         <button type="button" id="btn-parallelCoord" class="btn btn-color">平行坐标系</button>
                         <button type="button" id="btn-boxplot" class="btn btn-color">箱线图</button>
                     </div>
@@ -172,6 +176,18 @@
         </div>
     </div>
     <script>
+
+    function scatter(){
+        console.log('scatter');
+        clearMainVis();
+        currentVis = 'scatter';
+        d3.select('#main-vis')
+            .append('img')
+            .attr('src', 'data/img/QQ20190609-202726@2x.png')
+            .attr('height', '600')
+            .attr('width', '1300');
+
+    }
     //监听添加tag
     dispatch.on('addtag', selectedId => {
         console.log(selectedId);
