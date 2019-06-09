@@ -2,28 +2,50 @@ const grid = function() {
     dispatch.on('initgrids', (grids, sensors, tree) => {
         console.log('[event] init grid', grids, sensors);
 
-        currentVis = 'grids'
+        currentVis = 'grids';
+
+        //界面处理
         clearMainVis();
 
         if (d3.select('#main-footer').empty()) {
             d3.select('#main-wrapper')
                 .append('div')
                 .attr('id', 'main-footer')
+                .attr('class', 'row')
         }
 
-        d3.select('#main-footer')
-            .append('button')
+        //left for svg
+        const leftfooter = d3.select('#main-footer')
+            .append('div')
+            .attr('id', 'left-main-footer')
+            .attr('class', 'col-6')
+
+        leftfooter.append('button')
             .attr('class', 'btn btn-primary dom-grid')
             .attr('id', 'btn-grid-addnode')
             .text('添加种类')
             .on('click', addType);
 
-        d3.select('#main-footer')
-            .append('input')
+        leftfooter.append('input')
             .attr('class', 'dom-grid')
             .attr('type', 'text')
             .attr('id', 'grid-input-typename');
 
+        //right for canvans
+        const rightfooter = d3.select('#main-footer')
+            .append('div')
+            .attr('id', 'right-main-footer')
+            .attr('class', 'col-6')
+
+        rightfooter.append('button')
+            .attr('class', 'btn btn-primary')
+            .text('run')
+            .on('click', () => {
+                console.log('画图');
+                draw_canvas();
+            })
+
+        //数据处理
         updateType();
 
         const dataByFloor = floor => ({
@@ -41,10 +63,13 @@ const grid = function() {
             .height(content.height);
 
         // selections
-        const svg = d3.select('#main-vis')
-            .append('svg')
+        const leftdiv = d3.select('#main-vis')
+            .append('div')
+            .attr('class', 'col-6')
+            
+        const svg = leftdiv.append('svg')
             .style('background', 'grey')
-            .attr('width', container.width)
+            .attr('width', container.width / 2)
             .attr('height', container.height)
 
         const g = svg
@@ -52,7 +77,7 @@ const grid = function() {
             .data([floor1, floor2])
             .join('g')
             .attr('class', 'gGrid')
-            .attr('transform', (d, i) => `translate(${content.width  / 2 - content.height / 2},${ 50 + content.height / 2 * i})`)
+            .attr('transform', (d, i) => `translate(${45},${ 50 + content.height / 2 * i})`)
 
         g.append('g')
             .attr('class', 'grid-xAixs');
@@ -66,7 +91,65 @@ const grid = function() {
         g.append('g')
             .attr('class', 'grid-circle');
 
+        //绘制左边的图
         g.call(chart);
+
+
+        //绘制右边的图
+        //添加两个canvans
+        const rightdiv = d3.select('#main-vis')
+            .append('div')
+            .attr('class', 'col-6')
+            .attr('id', 'right-div')
+
+        const canvasDiv = rightdiv.append('div')
+                            .attr('id', 'can-div')
+
+
+        canvasDiv
+            .append('canvas')
+            .attr('id', 'canvas')
+            .attr('width',`${1800}px`)
+            .attr('height', `${960}px`)//;height:300px
+
+
+        canvasDiv
+            .append('canvas')
+            .attr('id', 'canvas2')
+            .attr('width',`${1800}px`)
+            .attr('height', `${960}px`)
+
+        $('#can-div').after(`<div id='time-div'>
+            <input id="time_range" type="range" class="custom-range" min="25000" max="73000" value="0" style="width: 600px;" oninput="change_time()" />
+        </div>`)
+
+        $('#time-div').after(`<div>
+            <label id="show_time" style="width:100px">00 : 00 : 00</label>
+            &nbsp;&nbsp;&nbsp;
+            <label id="show_second" style="width:100px">00 : 00 : 00</label>
+        </div>`)
+
+        rightfooter.append('input')
+            .attr('class', 'btn btn-primary')
+            .attr('id', 'stop_button')
+            .attr('type', 'button')
+            .attr('value', 'stop')
+            .on('click', () => {
+                stop_button();
+            })
+
+
+        $('#stop_button').after(`<select id="day_select">
+                <option value="1">Day1</option>
+                <option value="2">Day2</option>
+                <option value="3">Day3</option>
+            </select>`)
+
+        $('#day_select').after(` &nbsp;&nbsp;<input id="show_heatmap" type="button" value="Heatmap: off" onclick="show_heatmap()" />`)
+        $('#show_heatmap').after(`&nbsp;&nbsp;<input id="person_button" type="button" value="Person: on" onclick="show_person();" />
+            id:<input id="id_num" type="number" value="19996" style="width: 70px">
+            <input type="button" value="draw" onclick="change_id()" />`)
+        //一些定义
 
         dispatch.on('update.grid', tree_data => {
             console.log('[event] update: grid', tree_data);
@@ -132,16 +215,16 @@ const grid = function() {
                         .rangeRound([0, height]);
 
                     const alltype = []
-                    for(let g of grids){
+                    for (let g of grids) {
                         const t = g.type;
-                        if(alltype.indexOf(t) === -1){
+                        if (alltype.indexOf(t) === -1) {
                             alltype.push(t);
                         }
                     }
 
                     const range = [];
                     const step = 1 / alltype.length;
-                    for(let i = 0; i < 1; i += step){
+                    for (let i = 0; i < 1; i += step) {
                         range.push(d3.interpolateSpectral(i))
                     }
                     const color = d3.scaleOrdinal()

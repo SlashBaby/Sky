@@ -25,9 +25,16 @@
     <script src="js/paraCoord.js"></script>
     <script src="js/boxplot.js"></script>
     <script src="js/treemap.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega@5.4.0"></script>
+    <script src="js/Point/draw_canvas.js"></script>
+    <script src="js/Point/global_var.js"></script>
+    <script src="js/Point/ui_control.js"></script>
+    <script src="js/Point/js/jquery-3.3.1.min.js"></script>
+    <script src='js/Point/js/js-colormaps.js'></script>
+    <script src='js/Point/js/jquery.timer.js'></script>
+    <script src="js/Point/js/papaparse.min.js"></script>
+<!--     <script src="https://cdn.jsdelivr.net/npm/vega@5.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@3.3.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-embed@4.2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@4.2.0"></script> -->
     <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.4.10/dist/g2.min.js"></script>
     <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.data-set-0.10.1/dist/data-set.min.js"></script>
     <style>
@@ -46,7 +53,7 @@
       }
       #left-vis{
         background:red;
-        height: 650px;
+        height: 670px;
         overflow:hidden;
       }
 
@@ -59,7 +66,7 @@
       }
       #main-vis{
         background:white;
-        height:650px;
+        height:670px;
       }
       #main-footer{
         background:yellow;
@@ -67,6 +74,18 @@
       }      
       #right-wrapper{
         background:black;   
+      }
+      #left-main-footer{
+        background: red;
+        width: 655px;
+      }
+      #right-main-footer{
+        background: green;
+        width: 655px;
+      }
+      canvas {
+        margin-top:3px;
+        border: 3px solid rgb(170, 170, 170);width:600px;height:300px
       }
       
     </style>
@@ -93,7 +112,7 @@
                 </div>
             </div>
             <div id="main-wrapper" class="col-10">
-                <div id="main-nav">
+                <div id="main-nav" class='row'>
                     <button type="button" id="btn-grids" class="btn btn-info">grids</button>
                     <button type="button" id="btn-bubbles" class="btn btn-info">bubbles</button>
                     <!-- <button type="button" id="btn-areas" class="btn btn-info">areas</button> -->
@@ -103,7 +122,7 @@
                     <button type="button" id="btn-update" class="btn btn-primary">update</button>
                     <button type="button" id="btn-save-data" class="btn btn-primary">save data</button>
                 </div>
-                <div id="main-vis"></div>
+                <div id="main-vis" class='row'></div>
             </div>
             <!-- <div id="right-wrapper" class="col-3">
                 <div id="right-vis">
@@ -205,7 +224,7 @@
                 console.log('save')
                 if (currentLeftVis === 'tree') {
                     saveTree(grids_data)
-                } else if (currentLeftVis === 'treemap'){
+                } else if (currentLeftVis === 'treemap') {
                     saveToJson(allpeople, 'people')
                 }
 

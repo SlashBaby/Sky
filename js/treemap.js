@@ -84,7 +84,8 @@ const treemap = function() {
         for (let i = 0; i < 1; i += step) {
             range.push(d3.interpolateCool(i))
         }
-        console.log(countByType.keys())
+        const domain = countByType.keys()
+        domain.sort((a, b) => countByType.get(a.type) - countByType.get(b.type));
         const color = d3.scaleOrdinal()
             .domain(countByType.keys())
             .range(range);
@@ -108,7 +109,8 @@ const treemap = function() {
             .attr('width', w)
             .attr('height', h)
             .on('click', d => {
-                data.forEach(item => { if (item.type === d.type) d.isSelected = !d.isSelected });
+                console.log('click');
+                data.forEach(item => { if (item.type === d.type) item.isSelected = !item.isSelected });
                 dispatch.call('inittreemap', this, data);
             })
             .append('title')
